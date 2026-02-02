@@ -696,6 +696,13 @@ export default function ChordGenerator() {
     synthRhythm: "sustained",
   })
 
+  const [bpmInput, setBpmInput] = useState(settings.bpm.toString())
+
+  // Keep bpmInput in sync when settings.bpm changes
+  useEffect(() => {
+    setBpmInput(settings.bpm.toString())
+  }, [settings.bpm])
+
   const [progression, setProgression] = useState<Chord[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [activeChordIndex, setActiveChordIndex] = useState(-1)
@@ -1821,8 +1828,25 @@ export default function ChordGenerator() {
               <div className="bg-white rounded border border-[#c0c0b8] shadow-sm">
                 <input
                   type="number"
-                  value={settings.bpm}
-                  onChange={(e) => setSettings((s) => ({ ...s, bpm: Math.max(40, Math.min(200, parseInt(e.target.value) || 90)) }))}
+                  value={bpmInput}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    setBpmInput(val)
+                    const num = parseInt(val)
+                    if (!isNaN(num)) {
+                      // Update settings only if it's a valid number and within reasonable bounds
+                      // but don't clamp here so the user can finish typing
+                      if (num >= 1 && num <= 999) {
+                        setSettings((s) => ({ ...s, bpm: num }))
+                      }
+                    }
+                  }}
+                  onBlur={() => {
+                    const num = parseInt(bpmInput)
+                    const clamped = Math.max(40, Math.min(200, num || 90))
+                    setSettings((s) => ({ ...s, bpm: clamped }))
+                    setBpmInput(clamped.toString())
+                  }}
                   min={40}
                   max={200}
                   className="w-full bg-transparent px-2 py-2.5 text-sm font-bold text-center focus:outline-none"
