@@ -806,12 +806,17 @@ export default function ChordGenerator() {
     masterGainRef.current.gain.value = 0.8
 
     analyserRef.current = audioCtxRef.current.createAnalyser()
-    analyserRef.current.fftSize = 256
+    analyserRef.current.fftSize = 1024
+    analyserRef.current.smoothingTimeConstant = 0.6
 
     reverbNodeRef.current = createReverb()
 
     masterGainRef.current.connect(analyserRef.current)
     analyserRef.current.connect(audioCtxRef.current.destination)
+
+    if (audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume()
+    }
   }, [createReverb])
 
   const stopAllNodes = useCallback(() => {
@@ -1674,17 +1679,23 @@ export default function ChordGenerator() {
   // Visualizer animation
   useEffect(() => {
     let animationFrame: number
+    const dataArray = new Uint8Array(512) // Pre-allocate for 1024 fftSize
 
     const animate = () => {
       if (analyserRef.current) {
-        const bufferLength = analyserRef.current.frequencyBinCount
-        const dataArray = new Uint8Array(bufferLength)
         analyserRef.current.getByteFrequencyData(dataArray)
 
+        const bufferLength = analyserRef.current.frequencyBinCount
         const step = Math.floor(bufferLength / 32)
+        
         const newData = Array.from({ length: 32 }, (_, i) => {
-          const value = dataArray[i * step]
-          return Math.max(4, (value / 255) * 60)
+          let sum = 0
+          for (let j = 0; j < step; j++) {
+            sum += dataArray[i * step + j]
+          }
+          const average = sum / step
+          // Use a combination of average and peak for better visualization
+          return Math.max(4, (average / 255) * 100)
         })
 
         setVisualizerData(newData)
@@ -1812,7 +1823,7 @@ export default function ChordGenerator() {
                 {visualizerData.map((height, i) => (
                   <div
                     key={i}
-                    className="w-1.5 bg-[#ff3b30] rounded-t transition-[height] duration-75"
+                    className="w-1.5 bg-[#ff3b30] rounded-t"
                     style={{ height: `${height}%`, minHeight: "8%" }}
                   />
                 ))}
