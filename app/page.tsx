@@ -609,6 +609,20 @@ type Settings = {
   synthRhythm: string
 }
 
+const DEFAULT_SETTINGS: Settings = {
+  bpm: 90,
+  timeSignature: 4,
+  barsPerChord: 2,
+  drumsEnabled: true,
+  drumStyle: "basic",
+  metronomeEnabled: false,
+  chordVolume: 0.7,
+  drumVolume: 0.6,
+  reverbAmount: 0.4,
+  synthType: "pad",
+  synthRhythm: "sustained",
+}
+
 function formatChordType(type: string): string {
   const formats: Record<string, string> = {
     maj: "",
@@ -690,19 +704,7 @@ export default function ChordGenerator() {
   const [key, setKey] = useState("C")
   const [mode, setMode] = useState("major")
   const [style, setStyle] = useState("modern")
-  const [settings, setSettings] = useState<Settings>({
-    bpm: 90,
-    timeSignature: 4,
-    barsPerChord: 2,
-    drumsEnabled: true,
-    drumStyle: "basic",
-    metronomeEnabled: false,
-    chordVolume: 0.7,
-    drumVolume: 0.6,
-    reverbAmount: 0.4,
-    synthType: "pad",
-    synthRhythm: "sustained",
-  })
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
 
   const [bpmInput, setBpmInput] = useState(settings.bpm.toString())
 
@@ -717,6 +719,40 @@ export default function ChordGenerator() {
   const [visualizerData, setVisualizerData] = useState<number[]>(new Array(32).fill(4))
   const [savedProgressions, setSavedProgressions] = useState<{ name: string; key: string; mode: string; chords: Chord[] }[]>([])
   const [editingChord, setEditingChord] = useState<{index: number, root: string, type: string} | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // Load everything from local storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("chord-gen-config")
+    if (saved) {
+      try {
+        const config = JSON.parse(saved)
+        if (config.key) setKey(config.key)
+        if (config.mode) setMode(config.mode)
+        if (config.style) setStyle(config.style)
+        if (config.settings) setSettings(config.settings)
+        if (config.progression) setProgression(config.progression)
+        if (config.savedProgressions) setSavedProgressions(config.savedProgressions)
+      } catch (e) {
+        console.error("Failed to load config", e)
+      }
+    }
+    setIsLoaded(true)
+  }, [])
+
+  // Save everything to local storage when state changes
+  useEffect(() => {
+    if (!isLoaded) return
+    const config = {
+      key,
+      mode,
+      style,
+      settings,
+      progression,
+      savedProgressions
+    }
+    localStorage.setItem("chord-gen-config", JSON.stringify(config))
+  }, [key, mode, style, settings, progression, savedProgressions, isLoaded])
 
   const audioCtxRef = useRef<AudioContext | null>(null)
   const masterGainRef = useRef<GainNode | null>(null)
@@ -1534,6 +1570,13 @@ export default function ChordGenerator() {
     setEditingChord(null)
   }, [])
 
+  const resetSettings = useCallback(() => {
+    setSettings(DEFAULT_SETTINGS)
+    setKey("C")
+    setMode("major")
+    setStyle("modern")
+  }, [])
+
   const startPlayback = useCallback(() => {
     initAudio()
 
@@ -2044,30 +2087,36 @@ export default function ChordGenerator() {
             </div>
 
             {/* Action Buttons Row */}
-            <div className="grid grid-cols-4 gap-2 mb-3">
+            <div className="flex flex-wrap gap-2 mb-3">
               <button
                 onClick={exportProgression}
-                className="bg-white rounded border border-[#c0c0b8] shadow-sm px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
+                className="flex-1 min-w-[60px] bg-white rounded border border-[#c0c0b8] shadow-sm px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
               >
                 Copy
               </button>
               <button
                 onClick={saveProgression}
-                className="bg-white rounded border border-[#c0c0b8] shadow-sm px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
+                className="flex-1 min-w-[60px] bg-white rounded border border-[#c0c0b8] shadow-sm px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
               >
                 Save
               </button>
               <button
                 onClick={exportMidi}
-                className="bg-white rounded border border-[#c0c0b8] shadow-sm px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
+                className="flex-1 min-w-[60px] bg-white rounded border border-[#c0c0b8] shadow-sm px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
               >
                 Export
               </button>
               <button
                 onClick={generateProgression}
-                className="bg-[#1a1a1a] text-white rounded border border-[#1a1a1a] shadow-sm px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#333] transition-colors"
+                className="flex-1 min-w-[60px] bg-[#1a1a1a] text-white rounded border border-[#1a1a1a] shadow-sm px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#333] transition-colors"
               >
                 Regen
+              </button>
+              <button
+                onClick={resetSettings}
+                className="flex-1 min-w-[60px] bg-white rounded border border-[#c0c0b8] shadow-sm px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#f5f5f0] transition-colors"
+              >
+                Reset
               </button>
             </div>
 
