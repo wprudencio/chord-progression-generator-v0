@@ -1,6 +1,14 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { Pencil } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 // Note frequencies (A4 = 440Hz)
 const NOTE_FREQUENCIES: Record<string, number> = {
@@ -708,6 +716,7 @@ export default function ChordGenerator() {
   const [activeChordIndex, setActiveChordIndex] = useState(-1)
   const [visualizerData, setVisualizerData] = useState<number[]>(new Array(32).fill(4))
   const [savedProgressions, setSavedProgressions] = useState<{ name: string; key: string; mode: string; chords: Chord[] }[]>([])
+  const [editingChord, setEditingChord] = useState<{index: number, root: string, type: string} | null>(null)
 
   const audioCtxRef = useRef<AudioContext | null>(null)
   const masterGainRef = useRef<GainNode | null>(null)
@@ -1508,6 +1517,23 @@ export default function ChordGenerator() {
     }
   }, [key, mode, style])
 
+  const updateChord = useCallback((index: number, root: string, type: string) => {
+    const frequencies = getChordNotes(root, type, 3)
+    const name = root + formatChordType(type)
+    const newChord = {
+      root,
+      type,
+      name,
+      frequencies,
+    }
+
+    const newProgression = [...progressionRef.current]
+    newProgression[index] = newChord
+    setProgression(newProgression)
+    progressionRef.current = newProgression
+    setEditingChord(null)
+  }, [])
+
   const startPlayback = useCallback(() => {
     initAudio()
 
@@ -1721,6 +1747,15 @@ export default function ChordGenerator() {
                     {activeChordIndex === i && (
                       <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                     )}
+                    <div 
+                      className={`absolute top-1 right-4 p-1 rounded-full hover:bg-white/20 transition-colors cursor-pointer z-10 ${activeChordIndex === i ? "text-white/70 hover:text-white" : "text-[#444] hover:text-[#ff3b30]"}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingChord({ index: i, root: chord.root, type: chord.type })
+                      }}
+                    >
+                      <Pencil size={10} />
+                    </div>
                   </button>
                 ))}
               </div>
@@ -2100,6 +2135,50 @@ export default function ChordGenerator() {
           </div>
         </div>
       </div>
+
+      <Dialog open={!!editingChord} onOpenChange={(open) => !open && setEditingChord(null)}>
+        <DialogContent className="bg-[#1a1a1a] border-[#333] text-[#e0e0dc]">
+          <DialogHeader>
+            <DialogTitle className="text-[#ff3b30] uppercase tracking-wider font-mono">Edit Chord</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4 font-mono">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] text-[#888] uppercase tracking-widest mb-1.5 block">Root Note</label>
+                <select
+                  className="w-full bg-[#0a0a0a] border border-[#333] rounded px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#ff3b30] text-[#ccc] appearance-none"
+                  value={editingChord?.root}
+                  onChange={(e) => setEditingChord(prev => prev ? { ...prev, root: e.target.value } : null)}
+                >
+                  {NOTES.map(note => (
+                    <option key={note} value={note}>{note}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] text-[#888] uppercase tracking-widest mb-1.5 block">Chord Type</label>
+                <select
+                  className="w-full bg-[#0a0a0a] border border-[#333] rounded px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#ff3b30] text-[#ccc] appearance-none"
+                  value={editingChord?.type}
+                  onChange={(e) => setEditingChord(prev => prev ? { ...prev, type: e.target.value } : null)}
+                >
+                  {Object.keys(CHORD_TYPES).map(type => (
+                    <option key={type} value={type}>{getChordTypeName(type)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <button
+              onClick={() => editingChord && updateChord(editingChord.index, editingChord.root, editingChord.type)}
+              className="w-full bg-[#ff3b30] text-white py-3 rounded font-bold uppercase text-sm tracking-widest hover:bg-[#ff3b30]/90 transition-all shadow-[0_2px_10px_rgba(255,59,48,0.3)]"
+            >
+              Update Chord
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
