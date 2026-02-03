@@ -810,6 +810,9 @@ export default function ChordGenerator() {
     analyserRef.current.smoothingTimeConstant = 0.6
 
     reverbNodeRef.current = createReverb()
+    if (reverbNodeRef.current) {
+      reverbNodeRef.current.connect(masterGainRef.current)
+    }
 
     masterGainRef.current.connect(analyserRef.current)
     analyserRef.current.connect(audioCtxRef.current.destination)
@@ -835,6 +838,22 @@ export default function ChordGenerator() {
     if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
     const vol = settingsRef.current.chordVolume
+    const reverbAmount = settingsRef.current.reverbAmount
+
+    const applyReverb = (node: AudioNode) => {
+      if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
+      
+      const dryGain = audioCtxRef.current.createGain()
+      const wetGain = audioCtxRef.current.createGain()
+      
+      dryGain.gain.value = 1 - reverbAmount
+      wetGain.gain.value = reverbAmount
+      
+      node.connect(dryGain)
+      node.connect(wetGain)
+      dryGain.connect(masterGainRef.current)
+      wetGain.connect(reverbNodeRef.current)
+    }
 
     switch (synthType) {
       case "pad": {
@@ -860,17 +879,7 @@ export default function ChordGenerator() {
         osc1.connect(filter)
         osc2.connect(filter)
         filter.connect(gain)
-
-        const dryGain = audioCtxRef.current.createGain()
-        const wetGain = audioCtxRef.current.createGain()
-        dryGain.gain.value = 1 - settingsRef.current.reverbAmount
-        wetGain.gain.value = settingsRef.current.reverbAmount
-
-        gain.connect(dryGain)
-        gain.connect(wetGain)
-        dryGain.connect(masterGainRef.current)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc1, osc2)
         osc1.start(time)
@@ -896,7 +905,7 @@ export default function ChordGenerator() {
 
         osc.connect(filter)
         filter.connect(gain)
-        gain.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc)
         osc.start(time)
@@ -924,17 +933,7 @@ export default function ChordGenerator() {
         osc.connect(filter)
         osc2.connect(filter)
         filter.connect(gain)
-
-        const dryGain = audioCtxRef.current.createGain()
-        const wetGain = audioCtxRef.current.createGain()
-        dryGain.gain.value = 1 - settingsRef.current.reverbAmount * 0.5
-        wetGain.gain.value = settingsRef.current.reverbAmount * 0.5
-
-        gain.connect(dryGain)
-        gain.connect(wetGain)
-        dryGain.connect(masterGainRef.current)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc, osc2)
         osc.start(time)
@@ -970,13 +969,7 @@ export default function ChordGenerator() {
         osc2.connect(filter)
         osc3.connect(filter)
         filter.connect(gain)
-
-        const wetGain = audioCtxRef.current.createGain()
-        wetGain.gain.value = settingsRef.current.reverbAmount * 0.8
-        gain.connect(masterGainRef.current)
-        gain.connect(wetGain)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc1, osc2, osc3)
         osc1.start(time)
@@ -1010,12 +1003,7 @@ export default function ChordGenerator() {
           hGain.connect(gain)
         })
 
-        const wetGain = audioCtxRef.current.createGain()
-        wetGain.gain.value = settingsRef.current.reverbAmount * 0.3
-        gain.connect(masterGainRef.current)
-        gain.connect(wetGain)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         oscs.forEach((osc) => {
           activeNodesRef.current.push(osc)
@@ -1039,13 +1027,7 @@ export default function ChordGenerator() {
           gain.gain.exponentialRampToValueAtTime(0.001, time + duration * (1 - i * 0.15))
 
           osc.connect(gain)
-
-          const wetGain = audioCtxRef.current!.createGain()
-          wetGain.gain.value = settingsRef.current.reverbAmount * 0.6
-          gain.connect(masterGainRef.current!)
-          gain.connect(wetGain)
-          wetGain.connect(reverbNodeRef.current!)
-          reverbNodeRef.current!.connect(masterGainRef.current!)
+          applyReverb(gain)
 
           activeNodesRef.current.push(osc)
           osc.start(time)
@@ -1075,7 +1057,7 @@ export default function ChordGenerator() {
         osc.connect(filter)
         osc2.connect(filter)
         filter.connect(gain)
-        gain.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc, osc2)
         osc.start(time)
@@ -1108,13 +1090,7 @@ export default function ChordGenerator() {
         osc.connect(filter)
         osc2.connect(filter)
         filter.connect(gain)
-
-        const wetGain = audioCtxRef.current.createGain()
-        wetGain.gain.value = settingsRef.current.reverbAmount * 0.4
-        gain.connect(masterGainRef.current)
-        gain.connect(wetGain)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc, osc2)
         osc.start(time)
@@ -1148,13 +1124,7 @@ export default function ChordGenerator() {
         osc1.connect(filter)
         osc2.connect(filter)
         filter.connect(gain)
-
-        const wetGain = audioCtxRef.current.createGain()
-        wetGain.gain.value = settingsRef.current.reverbAmount * 0.3
-        gain.connect(masterGainRef.current)
-        gain.connect(wetGain)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc1, osc2)
         osc1.start(time)
@@ -1184,7 +1154,7 @@ export default function ChordGenerator() {
         gain.gain.exponentialRampToValueAtTime(0.001, time + duration)
 
         carrier.connect(gain)
-        gain.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(carrier, modulator)
         carrier.start(time)
@@ -1216,13 +1186,7 @@ export default function ChordGenerator() {
         gain.gain.linearRampToValueAtTime(0, time + duration)
 
         filter.connect(gain)
-
-        const wetGain = audioCtxRef.current.createGain()
-        wetGain.gain.value = settingsRef.current.reverbAmount * 0.5
-        gain.connect(masterGainRef.current)
-        gain.connect(wetGain)
-        wetGain.connect(reverbNodeRef.current)
-        reverbNodeRef.current.connect(masterGainRef.current)
+        applyReverb(gain)
 
         oscs.forEach((osc) => {
           activeNodesRef.current.push(osc)
@@ -1259,7 +1223,7 @@ export default function ChordGenerator() {
 
         osc.connect(filter)
         filter.connect(gain)
-        gain.connect(masterGainRef.current)
+        applyReverb(gain)
 
         activeNodesRef.current.push(osc, lfo)
         osc.start(time)
@@ -1320,7 +1284,7 @@ export default function ChordGenerator() {
   )
 
   const playKick = useCallback((time: number) => {
-    if (!audioCtxRef.current || !masterGainRef.current) return
+    if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
     const osc = audioCtxRef.current.createOscillator()
     const gain = audioCtxRef.current.createGain()
@@ -1333,7 +1297,18 @@ export default function ChordGenerator() {
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.3)
 
     osc.connect(gain)
-    gain.connect(masterGainRef.current)
+
+    const dryGain = audioCtxRef.current.createGain()
+    const wetGain = audioCtxRef.current.createGain()
+    const reverbAmount = settingsRef.current.reverbAmount * 0.2 // Less reverb on kick
+
+    dryGain.gain.value = 1 - reverbAmount
+    wetGain.gain.value = reverbAmount
+
+    gain.connect(dryGain)
+    gain.connect(wetGain)
+    dryGain.connect(masterGainRef.current)
+    wetGain.connect(reverbNodeRef.current)
 
     activeNodesRef.current.push(osc)
     osc.start(time)
@@ -1341,7 +1316,7 @@ export default function ChordGenerator() {
   }, [])
 
   const playSnare = useCallback((time: number) => {
-    if (!audioCtxRef.current || !masterGainRef.current) return
+    if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
     const bufferSize = audioCtxRef.current.sampleRate * 0.2
     const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate)
@@ -1364,7 +1339,6 @@ export default function ChordGenerator() {
 
     noise.connect(noiseFilter)
     noiseFilter.connect(noiseGain)
-    noiseGain.connect(masterGainRef.current)
 
     const osc = audioCtxRef.current.createOscillator()
     const oscGain = audioCtxRef.current.createGain()
@@ -1373,7 +1347,21 @@ export default function ChordGenerator() {
     oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1)
 
     osc.connect(oscGain)
-    oscGain.connect(masterGainRef.current)
+
+    const dryGain = audioCtxRef.current.createGain()
+    const wetGain = audioCtxRef.current.createGain()
+    const reverbAmount = settingsRef.current.reverbAmount * 0.5
+
+    dryGain.gain.value = 1 - reverbAmount
+    wetGain.gain.value = reverbAmount
+
+    noiseGain.connect(dryGain)
+    noiseGain.connect(wetGain)
+    oscGain.connect(dryGain)
+    oscGain.connect(wetGain)
+
+    dryGain.connect(masterGainRef.current)
+    wetGain.connect(reverbNodeRef.current)
 
     activeNodesRef.current.push(noise, osc)
     noise.start(time)
@@ -1382,7 +1370,7 @@ export default function ChordGenerator() {
   }, [])
 
   const playHiHat = useCallback((time: number, open: boolean = false) => {
-    if (!audioCtxRef.current || !masterGainRef.current) return
+    if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
     const bufferSize = audioCtxRef.current.sampleRate * (open ? 0.3 : 0.05)
     const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate)
@@ -1405,7 +1393,18 @@ export default function ChordGenerator() {
 
     noise.connect(filter)
     filter.connect(gain)
-    gain.connect(masterGainRef.current)
+
+    const dryGain = audioCtxRef.current.createGain()
+    const wetGain = audioCtxRef.current.createGain()
+    const reverbAmount = settingsRef.current.reverbAmount * 0.3
+
+    dryGain.gain.value = 1 - reverbAmount
+    wetGain.gain.value = reverbAmount
+
+    gain.connect(dryGain)
+    gain.connect(wetGain)
+    dryGain.connect(masterGainRef.current)
+    wetGain.connect(reverbNodeRef.current)
 
     activeNodesRef.current.push(noise)
     noise.start(time)
