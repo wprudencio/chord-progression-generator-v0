@@ -731,7 +731,10 @@ export default function ChordGenerator() {
         if (config.mode) setMode(config.mode)
         if (config.style) setStyle(config.style)
         if (config.settings) setSettings(config.settings)
-        if (config.progression) setProgression(config.progression)
+        if (config.progression) {
+          setProgression(config.progression)
+          progressionRef.current = config.progression
+        }
         if (config.savedProgressions) setSavedProgressions(config.savedProgressions)
       } catch (e) {
         console.error("Failed to load config", e)
@@ -1671,9 +1674,21 @@ export default function ChordGenerator() {
   }, [progression, key, mode, style, settings.bpm, settings.timeSignature])
 
   // Generate initial progression
+  const isFirstRender = useRef(true)
   useEffect(() => {
+    if (!isLoaded) return
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      // Only generate if we don't have a progression (i.e. nothing was in storage)
+      if (progressionRef.current.length === 0) {
+        generateProgression()
+      }
+      return
+    }
+
     generateProgression()
-  }, [generateProgression])
+  }, [generateProgression, isLoaded])
 
   // Visualizer animation
   useEffect(() => {
