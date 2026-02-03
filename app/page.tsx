@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Pencil } from "lucide-react"
+import { Pencil, X } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -1642,6 +1642,10 @@ export default function ChordGenerator() {
     progressionRef.current = saved.chords
   }, [])
 
+  const deleteSavedProgression = useCallback((index: number) => {
+    setSavedProgressions((prev) => prev.filter((_, i) => i !== index))
+  }, [])
+
   const exportProgression = useCallback(() => {
     const text = progression.map((c) => c.name).join(" - ")
     navigator.clipboard.writeText(text)
@@ -2165,13 +2169,23 @@ export default function ChordGenerator() {
                 <div className="text-[8px] text-[#888] uppercase tracking-wider mb-2">Saved</div>
                 <div className="flex flex-wrap gap-1">
                   {savedProgressions.map((saved, i) => (
-                    <button
-                      key={i}
-                      onClick={() => loadProgression(saved)}
-                      className="bg-white rounded border border-[#c0c0b8] px-2 py-1 text-[9px] uppercase tracking-wider hover:border-[#ff3b30] transition-colors"
-                    >
-                      {saved.chords.map((c) => c.name).join(" ")}
-                    </button>
+                    <div key={i} className="group relative flex items-center">
+                      <button
+                        onClick={() => loadProgression(saved)}
+                        className="bg-white rounded border border-[#c0c0b8] pl-2 pr-6 py-1 text-[9px] uppercase tracking-wider hover:border-[#ff3b30] transition-colors"
+                      >
+                        {saved.chords.map((c) => c.name).join(" ")}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deleteSavedProgression(i)
+                        }}
+                        className="absolute right-1 p-0.5 text-[#888] hover:text-[#ff3b30] transition-colors"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
