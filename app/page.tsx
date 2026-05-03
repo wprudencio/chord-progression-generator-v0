@@ -1874,292 +1874,326 @@ export default function ChordGenerator() {
             </div>
           </div>
 
-          {/* Controls Section */}
-          <div className="p-3 pt-2">
-            {/* Row 1: Composition Controls */}
-            <div className="mb-3">
-              <div className="grid grid-cols-6 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
-                <span>KEY</span>
-                <span>MODE</span>
-                <span>STYLE</span>
-                <span>BPM</span>
-                <span>TIME</span>
-                <span>BARS</span>
+          {/* Controls Section — Boxed Panels */}
+          <div className="p-3 pt-2 space-y-3">
+
+            {/* PANEL: CHORD CONFIG */}
+            <div className="border-2 border-[#CCCCCC] bg-[#F5F5F3]">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EBEBEB] border-b-2 border-[#CCCCCC]">
+                <span className="w-2 h-2 bg-[#F04E23]" />
+                <span className="mono-label text-[9px] text-[#111111] font-[700] tracking-wider">CHORD CONFIG</span>
+                <span className="slash-divider text-[#666]">////</span>
+                <span className="mono-label text-[7px] text-[#666] uppercase">Key &middot; Mode &middot; Style &middot; Meter</span>
               </div>
-              <div className="grid grid-cols-6 gap-2">
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={key}
-                    onChange={(e) => setKey(e.target.value)}
-                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    {NOTES.map((n) => (
-                      <option key={n} value={n}>{n}</option>
-                    ))}
-                  </select>
+              <div className="p-3">
+                <div className="grid grid-cols-6 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
+                  <span>KEY</span>
+                  <span>MODE</span>
+                  <span>STYLE</span>
+                  <span>BPM</span>
+                  <span>TIME</span>
+                  <span>BARS</span>
                 </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={mode}
-                    onChange={(e) => setMode(e.target.value)}
-                    className="w-full bg-transparent px-0.5 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    <option value="major">Maj</option>
-                    <option value="minor">Min</option>
-                    <option value="dorian">Dor</option>
-                    <option value="mixolydian">Mix</option>
-                    <option value="lydian">Lyd</option>
-                    <option value="phrygian">Phr</option>
-                    <option value="locrian">Loc</option>
-                    <option value="aeolian">Aeo</option>
-                    <option value="harmonicMinor">Hrm</option>
-                    <option value="melodicMinor">Mel</option>
-                    <option value="wholeTone">Whl</option>
-                    <option value="blues">Blu</option>
-                    <option value="pentatonicMajor">Pn+</option>
-                    <option value="pentatonicMinor">Pn-</option>
-                    <option value="hungarian">Hun</option>
-                    <option value="japanese">Jpn</option>
-                    <option value="arabian">Arb</option>
-                    <option value="persian">Per</option>
-                    <option value="bebop">Bop</option>
-                  </select>
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={style}
-                    onChange={(e) => setStyle(e.target.value)}
-                    className="w-full bg-transparent px-0.5 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    <option value="modern">Pop</option>
-                    <option value="electronic">Elec</option>
-                    <option value="ambient">Amb</option>
-                    <option value="jazzy">Jazz</option>
-                    <option value="lofi">Lofi</option>
-                    <option value="cinematic">Cine</option>
-                    <option value="rnb">R&B</option>
-                    <option value="gospel">Gosp</option>
-                    <option value="funk">Funk</option>
-                    <option value="indie">Indi</option>
-                    <option value="bossa">Boss</option>
-                    <option value="reggaeton">Regt</option>
-                    <option value="country">Ctry</option>
-                    <option value="metal">Metl</option>
-                    <option value="classical">Clsc</option>
-                    <option value="disco">Disc</option>
-                    <option value="synthwave">Synw</option>
-                    <option value="edm">EDM</option>
-                    <option value="latin">Latn</option>
-                    <option value="afrobeat">Afro</option>
-                  </select>
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <input
-                    type="number"
-                    value={bpmInput}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setBpmInput(val)
-                      const num = parseInt(val)
-                      if (!isNaN(num)) {
-                        if (num >= 1 && num <= 999) {
-                          setSettings((s) => ({ ...s, bpm: num }))
+                <div className="grid grid-cols-6 gap-2">
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={key}
+                      onChange={(e) => setKey(e.target.value)}
+                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      {NOTES.map((n) => (
+                        <option key={n} value={n}>{n}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={mode}
+                      onChange={(e) => setMode(e.target.value)}
+                      className="w-full bg-transparent px-0.5 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      <option value="major">Maj</option>
+                      <option value="minor">Min</option>
+                      <option value="dorian">Dor</option>
+                      <option value="mixolydian">Mix</option>
+                      <option value="lydian">Lyd</option>
+                      <option value="phrygian">Phr</option>
+                      <option value="locrian">Loc</option>
+                      <option value="aeolian">Aeo</option>
+                      <option value="harmonicMinor">Hrm</option>
+                      <option value="melodicMinor">Mel</option>
+                      <option value="wholeTone">Whl</option>
+                      <option value="blues">Blu</option>
+                      <option value="pentatonicMajor">Pn+</option>
+                      <option value="pentatonicMinor">Pn-</option>
+                      <option value="hungarian">Hun</option>
+                      <option value="japanese">Jpn</option>
+                      <option value="arabian">Arb</option>
+                      <option value="persian">Per</option>
+                      <option value="bebop">Bop</option>
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={style}
+                      onChange={(e) => setStyle(e.target.value)}
+                      className="w-full bg-transparent px-0.5 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      <option value="modern">Pop</option>
+                      <option value="electronic">Elec</option>
+                      <option value="ambient">Amb</option>
+                      <option value="jazzy">Jazz</option>
+                      <option value="lofi">Lofi</option>
+                      <option value="cinematic">Cine</option>
+                      <option value="rnb">R&B</option>
+                      <option value="gospel">Gosp</option>
+                      <option value="funk">Funk</option>
+                      <option value="indie">Indi</option>
+                      <option value="bossa">Boss</option>
+                      <option value="reggaeton">Regt</option>
+                      <option value="country">Ctry</option>
+                      <option value="metal">Metl</option>
+                      <option value="classical">Clsc</option>
+                      <option value="disco">Disc</option>
+                      <option value="synthwave">Synw</option>
+                      <option value="edm">EDM</option>
+                      <option value="latin">Latn</option>
+                      <option value="afrobeat">Afro</option>
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <input
+                      type="number"
+                      value={bpmInput}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setBpmInput(val)
+                        const num = parseInt(val)
+                        if (!isNaN(num)) {
+                          if (num >= 1 && num <= 999) {
+                            setSettings((s) => ({ ...s, bpm: num }))
+                          }
                         }
-                      }
-                    }}
-                    onBlur={() => {
-                      const num = parseInt(bpmInput)
-                      const clamped = Math.max(40, Math.min(200, num || 90))
-                      setSettings((s) => ({ ...s, bpm: clamped }))
-                      setBpmInput(clamped.toString())
-                    }}
-                    min={40}
-                    max={200}
-                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] text-center focus:outline-none font-mono"
-                  />
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={settings.timeSignature}
-                    onChange={(e) => setSettings((s) => ({ ...s, timeSignature: parseInt(e.target.value) }))}
-                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    <option value="4">4/4</option>
-                    <option value="3">3/4</option>
-                    <option value="6">6/8</option>
-                  </select>
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={settings.barsPerChord}
-                    onChange={(e) => setSettings((s) => ({ ...s, barsPerChord: parseInt(e.target.value) }))}
-                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2: Sound & Mix Controls */}
-            <div className="mb-3">
-              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
-                <span>SYNTH</span>
-                <span>RHYTHM</span>
-                <span>DRUMS</span>
-                <span>REVERB</span>
-                <span className="hidden sm:block"></span>
-                <span className="hidden sm:block"></span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={settings.synthType}
-                    onChange={(e) => setSettings((s) => ({ ...s, synthType: e.target.value }))}
-                    className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    <option value="pad">Pad</option>
-                    <option value="pluck">Pluck</option>
-                    <option value="keys">Keys</option>
-                    <option value="strings">Strng</option>
-                    <option value="organ">Organ</option>
-                    <option value="bell">Bell</option>
-                    <option value="bass">Bass</option>
-                    <option value="lead">Lead</option>
-                    <option value="brass">Brass</option>
-                    <option value="fm">FM</option>
-                    <option value="supersaw">Super</option>
-                    <option value="wobble">Wobb</option>
-                  </select>
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={settings.synthRhythm}
-                    onChange={(e) => setSettings((s) => ({ ...s, synthRhythm: e.target.value }))}
-                    className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    {Object.entries(SYNTH_RHYTHMS).map(([k, { name }]) => (
-                      <option key={k} value={k}>{name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                  <select
-                    value={settings.drumStyle}
-                    onChange={(e) => setSettings((s) => ({ ...s, drumStyle: e.target.value }))}
-                    className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                  >
-                    <option value="basic">Basic</option>
-                    <option value="hiphop">HpHop</option>
-                    <option value="house">House</option>
-                    <option value="trap">Trap</option>
-                    <option value="dnb">DnB</option>
-                    <option value="reggae">Regg</option>
-                    <option value="shuffle">Shuf</option>
-                    <option value="bossa">Bossa</option>
-                    <option value="reggaeton">Rgtn</option>
-                    <option value="none">None</option>
-                  </select>
-                </div>
-                <div className="bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-1.5">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={settings.reverbAmount * 100}
-                    onChange={(e) => setSettings((s) => ({ ...s, reverbAmount: parseInt(e.target.value) / 100 }))}
-                    className="w-full"
-                  />
-                </div>
-
-                {/* Volume sliders — inline on row on desktop, wrap on mobile */}
-                <div className="flex items-center gap-2 bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-1.5 col-span-2 sm:col-span-2">
-                  <span className="mono-label text-[8px] text-[#666] shrink-0">CH VOL</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={settings.chordVolume * 100}
-                    onChange={(e) => setSettings((s) => ({ ...s, chordVolume: parseInt(e.target.value) / 100 }))}
-                    className="flex-1"
-                  />
-                  <span className="mono-label text-[8px] text-[#666] shrink-0">DR VOL</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={settings.drumVolume * 100}
-                    onChange={(e) => setSettings((s) => ({ ...s, drumVolume: parseInt(e.target.value) / 100 }))}
-                    className="flex-1"
-                  />
+                      }}
+                      onBlur={() => {
+                        const num = parseInt(bpmInput)
+                        const clamped = Math.max(40, Math.min(200, num || 90))
+                        setSettings((s) => ({ ...s, bpm: clamped }))
+                        setBpmInput(clamped.toString())
+                      }}
+                      min={40}
+                      max={200}
+                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] text-center focus:outline-none font-mono"
+                    />
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={settings.timeSignature}
+                      onChange={(e) => setSettings((s) => ({ ...s, timeSignature: parseInt(e.target.value) }))}
+                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      <option value="4">4/4</option>
+                      <option value="3">3/4</option>
+                      <option value="6">6/8</option>
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={settings.barsPerChord}
+                      onChange={(e) => setSettings((s) => ({ ...s, barsPerChord: parseInt(e.target.value) }))}
+                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="4">4</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Row 3: Togggles + Actions */}
-            <div className="mb-3">
-              <div className="flex flex-wrap gap-1.5">
-                {/* Toggles */}
-                <button
-                  onClick={() => setSettings((s) => ({ ...s, drumsEnabled: !s.drumsEnabled }))}
-                  className={`px-3 py-1.5 mono-label text-[9px] transition-all border
-                    ${settings.drumsEnabled 
-                      ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
-                      : "bg-[#F5F5F3] text-[#666] border-[#CCCCCC]"
-                    }`}
-                >
-                  DRUMS {settings.drumsEnabled ? "ON" : "OFF"}
-                </button>
-                <button
-                  onClick={() => setSettings((s) => ({ ...s, metronomeEnabled: !s.metronomeEnabled }))}
-                  className={`px-3 py-1.5 mono-label text-[9px] transition-all border
-                    ${settings.metronomeEnabled 
-                      ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
-                      : "bg-[#F5F5F3] text-[#666] border-[#CCCCCC]"
-                    }`}
-                >
-                  CLICK {settings.metronomeEnabled ? "ON" : "OFF"}
-                </button>
+            {/* PANEL: SYNTH CONFIG */}
+            <div className="border-2 border-[#CCCCCC] bg-[#F5F5F3]">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EBEBEB] border-b-2 border-[#CCCCCC]">
+                <span className="w-2 h-2 bg-[#F04E23]" />
+                <span className="mono-label text-[9px] text-[#111111] font-[700] tracking-wider">SYNTH CONFIG</span>
+                <span className="slash-divider text-[#666]">////</span>
+                <span className="mono-label text-[7px] text-[#666] uppercase">Osc &middot; Pattern &middot; Reverb &middot; Level</span>
+              </div>
+              <div className="p-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
+                  <span>SYNTH</span>
+                  <span>RHYTHM</span>
+                  <span>REVERB</span>
+                  <span>CH VOL</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={settings.synthType}
+                      onChange={(e) => setSettings((s) => ({ ...s, synthType: e.target.value }))}
+                      className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      <option value="pad">Pad</option>
+                      <option value="pluck">Pluck</option>
+                      <option value="keys">Keys</option>
+                      <option value="strings">Strng</option>
+                      <option value="organ">Organ</option>
+                      <option value="bell">Bell</option>
+                      <option value="bass">Bass</option>
+                      <option value="lead">Lead</option>
+                      <option value="brass">Brass</option>
+                      <option value="fm">FM</option>
+                      <option value="supersaw">Super</option>
+                      <option value="wobble">Wobb</option>
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={settings.synthRhythm}
+                      onChange={(e) => setSettings((s) => ({ ...s, synthRhythm: e.target.value }))}
+                      className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      {Object.entries(SYNTH_RHYTHMS).map(([k, { name }]) => (
+                        <option key={k} value={k}>{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC] px-2 py-1.5">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.reverbAmount * 100}
+                      onChange={(e) => setSettings((s) => ({ ...s, reverbAmount: parseInt(e.target.value) / 100 }))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC] px-2 py-1.5 flex items-center gap-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.chordVolume * 100}
+                      onChange={(e) => setSettings((s) => ({ ...s, chordVolume: parseInt(e.target.value) / 100 }))}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                <span className="w-[1px] bg-[#CCCCCC] mx-1 self-stretch" />
+            {/* PANEL: DRUM CONFIG */}
+            <div className="border-2 border-[#CCCCCC] bg-[#F5F5F3]">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EBEBEB] border-b-2 border-[#CCCCCC]">
+                <span className="w-2 h-2 bg-[#F04E23]" />
+                <span className="mono-label text-[9px] text-[#111111] font-[700] tracking-wider">DRUM CONFIG</span>
+                <span className="slash-divider text-[#666]">////</span>
+                <span className="mono-label text-[7px] text-[#666] uppercase">Pattern &middot; Level &middot; Toggle</span>
+              </div>
+              <div className="p-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
+                  <span>STYLE</span>
+                  <span>VOLUME</span>
+                  <span>ENABLE</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 items-center">
+                  <div className="bg-white border border-[#CCCCCC]">
+                    <select
+                      value={settings.drumStyle}
+                      onChange={(e) => setSettings((s) => ({ ...s, drumStyle: e.target.value }))}
+                      className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    >
+                      <option value="basic">Basic</option>
+                      <option value="hiphop">HpHop</option>
+                      <option value="house">House</option>
+                      <option value="trap">Trap</option>
+                      <option value="dnb">DnB</option>
+                      <option value="reggae">Regg</option>
+                      <option value="shuffle">Shuf</option>
+                      <option value="bossa">Bossa</option>
+                      <option value="reggaeton">Rgtn</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+                  <div className="bg-white border border-[#CCCCCC] px-2 py-1.5">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.drumVolume * 100}
+                      onChange={(e) => setSettings((s) => ({ ...s, drumVolume: parseInt(e.target.value) / 100 }))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setSettings((s) => ({ ...s, drumsEnabled: !s.drumsEnabled }))}
+                      className={`flex-1 px-3 py-2 mono-label text-[9px] transition-all border
+                        ${settings.drumsEnabled 
+                          ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
+                          : "bg-white text-[#666] border-[#CCCCCC]"
+                        }`}
+                    >
+                      DRUMS {settings.drumsEnabled ? "ON" : "OFF"}
+                    </button>
+                    <button
+                      onClick={() => setSettings((s) => ({ ...s, metronomeEnabled: !s.metronomeEnabled }))}
+                      className={`flex-1 px-3 py-2 mono-label text-[9px] transition-all border
+                        ${settings.metronomeEnabled 
+                          ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
+                          : "bg-white text-[#666] border-[#CCCCCC]"
+                        }`}
+                    >
+                      CLICK {settings.metronomeEnabled ? "ON" : "OFF"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                {/* Actions */}
-                <button
-                  onClick={exportProgression}
-                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
-                >
-                  COPY
-                </button>
-                <button
-                  onClick={saveProgression}
-                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
-                >
-                  SAVE
-                </button>
-                <button
-                  onClick={exportMidi}
-                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
-                >
-                  EXPORT
-                </button>
-
-                <span className="w-[1px] bg-[#CCCCCC] mx-1 self-stretch" />
-
-                {/* Utility */}
-                <button
-                  onClick={generateProgression}
-                  className="px-3 py-1.5 bg-[#111111] text-[#F5F5F3] border border-[#111111] mono-label text-[9px] hover:bg-[#1A1A1A] transition-colors"
-                >
-                  REGEN
-                </button>
-                <button
-                  onClick={resetSettings}
-                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
-                >
-                  RESET
-                </button>
+            {/* PANEL: ACTIONS */}
+            <div className="border-2 border-[#CCCCCC] bg-[#F5F5F3]">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EBEBEB] border-b-2 border-[#CCCCCC]">
+                <span className="w-2 h-2 bg-[#F04E23]" />
+                <span className="mono-label text-[9px] text-[#111111] font-[700] tracking-wider">ACTIONS</span>
+                <span className="slash-divider text-[#666]">////</span>
+                <span className="mono-label text-[7px] text-[#666] uppercase">Export &middot; Save &middot; Utility</span>
+              </div>
+              <div className="p-3">
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={exportProgression}
+                    className="px-4 py-2 bg-white border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                  >
+                    COPY
+                  </button>
+                  <button
+                    onClick={saveProgression}
+                    className="px-4 py-2 bg-white border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                  >
+                    SAVE
+                  </button>
+                  <button
+                    onClick={exportMidi}
+                    className="px-4 py-2 bg-white border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                  >
+                    EXPORT
+                  </button>
+                  <span className="w-[1px] bg-[#CCCCCC] mx-1 self-stretch" />
+                  <button
+                    onClick={generateProgression}
+                    className="px-4 py-2 bg-[#111111] text-[#F5F5F3] border border-[#111111] mono-label text-[9px] hover:bg-[#1A1A1A] transition-colors"
+                  >
+                    REGEN
+                  </button>
+                  <button
+                    onClick={resetSettings}
+                    className="px-4 py-2 bg-white border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                  >
+                    RESET
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -2172,7 +2206,7 @@ export default function ChordGenerator() {
                     <div key={i} className="group relative flex items-center">
                       <button
                         onClick={() => loadProgression(saved)}
-                        className="bg-[#F5F5F3] border border-[#CCCCCC] pl-2 pr-6 py-1 mono-label text-[8px] hover:border-[#F04E23] transition-colors"
+                        className="bg-white border border-[#CCCCCC] pl-2 pr-6 py-1 mono-label text-[8px] hover:border-[#F04E23] transition-colors"
                       >
                         {saved.chords.map((c) => c.name).join(" ")}
                       </button>
@@ -2191,7 +2225,6 @@ export default function ChordGenerator() {
               </div>
             )}
           </div>
-
           {/* Footer */}
           <div className="bg-[#111111] dark-panel px-4 py-2 text-center mono-label text-[8px] text-[#666]">
             SPACE = PLAY/STOP / R = REGENERATE / S = SAVE
