@@ -1760,7 +1760,7 @@ export default function ChordGenerator() {
               <span>output</span>
               <span className="text-[#F04E23]">input</span>
             </div>
-            <div className="flex gap-6">
+            <div className="hidden sm:flex gap-6">
               <span>sync</span>
               <span>midi</span>
             </div>
@@ -1770,235 +1770,255 @@ export default function ChordGenerator() {
             </div>
           </div>
 
-          {/* Display Area */}
-          <div className="bg-[#111111] m-3 overflow-hidden border border-[#CCCCCC]">
-            {/* Product Name Strip */}
-            <div className="bg-[#F5F5F3] px-4 py-3 border-b border-[#CCCCCC]">
-              <div className="flex items-baseline gap-3">
-                <span className="text-xl font-[800] tracking-tight text-[#111111]">CHORD.GEN</span>
-                <span className="brand-stamp">v.02</span>
-                <span className="slash-divider">////</span>
-                <span className="mono-label text-[#666]">PROGRESSION COMPOSER</span>
+          {/* Transport Bar — Top, always visible */}
+          <div className="grid grid-cols-2 gap-1 m-3 mb-0">
+            <button
+              onClick={isPlaying ? stopPlayback : startPlayback}
+              className={`flex items-center justify-center gap-2 py-5 font-[700] uppercase text-sm tracking-widest transition-all
+                ${isPlaying 
+                  ? "bg-[#F04E23] orange-panel text-[#111111]" 
+                  : "bg-[#111111] text-[#F5F5F3] hover:bg-[#1A1A1A]"
+                }`}
+            >
+              {isPlaying ? (
+                <>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                  </svg>
+                  STOP
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  PLAY
+                </>
+              )}
+            </button>
+            <button
+              onClick={generateProgression}
+              className="flex items-center justify-center gap-2 py-5 bg-[#F5F5F3] border border-[#CCCCCC] font-[700] uppercase text-sm tracking-widest hover:bg-[#EBEBEB] transition-all"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 4v6h-6M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+              </svg>
+              GENERATE
+            </button>
+          </div>
+
+          {/* Main Display Area */}
+          <div className="bg-[#111111] dark-panel m-3 mt-2 p-4 border border-[#CCCCCC]">
+            {/* Status + Product Strip (compact) */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-baseline gap-2">
+                <span className="text-base font-[800] tracking-tight text-[#F5F5F3]">CHORD.GEN</span>
+                <span className="brand-stamp text-[8px]">v.02</span>
               </div>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="mono-label text-[#666] text-[9px]">REF: T-LAB-{String(Math.floor(Math.random() * 90000 + 10000))}-U8</span>
-                <span className="mono-label text-[#F04E23] text-[9px]">STATUS: READY {'>>>'}</span>
+              <div className="flex items-center gap-3 mono-label text-[9px]">
+                <span className={`w-2 h-2 ${isPlaying ? "bg-[#F04E23]" : "bg-[#666]"}`} />
+                <span className="text-[#666]">{isPlaying ? "PLAYING" : "STOPPED"}</span>
+                <span className="text-[#666] mx-1">|</span>
+                <span className="text-[#F04E23] font-[700] tabular-nums">
+                  {String(Math.floor(currentBeatRef.current / (settings.timeSignature * 4)) + 1).padStart(2, "0")}.{String((currentBeatRef.current % (settings.timeSignature * 4)) + 1).padStart(1, "0")}
+                </span>
               </div>
             </div>
 
-            {/* LCD Screen */}
-            <div className="bg-[#111111] dark-panel p-4">
-              {/* Status Bar */}
-              <div className="flex items-center justify-between mb-3 mono-label text-[10px]">
-                <div className="flex items-center gap-3">
-                  <span className={`w-2 h-2 ${isPlaying ? "bg-[#F04E23]" : "bg-[#666]"}`} />
-                  <span className="text-[#666]">{isPlaying ? "PLAYING" : "STOPPED"}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[#666]">BAR</span>
-                  <span className="text-[#F04E23] font-bold text-lg font-mono tabular-nums">
-                    {String(Math.floor(currentBeatRef.current / (settings.timeSignature * 4)) + 1).padStart(2, "0")}.{String((currentBeatRef.current % (settings.timeSignature * 4)) + 1).padStart(1, "0")}
-                  </span>
-                </div>
-              </div>
-
-              {/* Chord Display */}
-              <div className="grid grid-cols-4 gap-[1px] mb-3">
-                {progression.map((chord, i) => (
-                  <button
-                    key={i}
-                    onClick={() => playChordPreview(i)}
-                    className={`relative p-3 transition-all cursor-pointer text-left border
-                      ${activeChordIndex === i 
-                        ? "bg-[#F04E23] orange-panel text-[#111111] border-[#F04E23]" 
-                        : "bg-[#111111] border-[#1A1A1A] text-[#F5F5F3] hover:border-[#F04E23]"
-                      }`}
+            {/* Chord Display — larger, more prominent */}
+            <div className="grid grid-cols-4 gap-[2px] mb-3">
+              {progression.map((chord, i) => (
+                <button
+                  key={i}
+                  onClick={() => playChordPreview(i)}
+                  className={`relative p-4 transition-all cursor-pointer text-left border
+                    ${activeChordIndex === i 
+                      ? "bg-[#F04E23] orange-panel text-[#111111] border-[#F04E23]" 
+                      : "bg-[#111111] border-[#1A1A1A] text-[#F5F5F3] hover:border-[#F04E23]"
+                    }`}
+                >
+                  <div className="text-xl font-[700] tracking-tight">
+                    {chord.root}
+                    <span className="text-xs font-normal opacity-70 ml-0.5">{formatChordType(chord.type)}</span>
+                  </div>
+                  <div className={`mono-label text-[8px] mt-0.5 ${activeChordIndex === i ? "text-[#111111]" : "text-[#666]"}`}>
+                    {getChordTypeName(chord.type)}
+                  </div>
+                  {activeChordIndex === i && (
+                    <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#111111]" />
+                  )}
+                  <div 
+                    className={`absolute top-1 right-5 p-1 transition-colors cursor-pointer z-10 ${activeChordIndex === i ? "text-[#111111] hover:text-[#111111]/70" : "text-[#666] hover:text-[#F04E23]"}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setEditingChord({ index: i, root: chord.root, type: chord.type })
+                    }}
                   >
-                    <div className="text-lg font-[700]">
-                      {chord.root}
-                      <span className="text-xs font-normal opacity-70">{formatChordType(chord.type)}</span>
-                    </div>
-                    <div className={`mono-label text-[9px] mt-0.5 ${activeChordIndex === i ? "text-[#111111]" : "text-[#666]"}`}>
-                      {getChordTypeName(chord.type)}
-                    </div>
-                    {activeChordIndex === i && (
-                      <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#111111]" />
-                    )}
-                    <div 
-                      className={`absolute top-1 right-4 p-1 transition-colors cursor-pointer z-10 ${activeChordIndex === i ? "text-[#111111] hover:text-[#111111]/70" : "text-[#666] hover:text-[#F04E23]"}`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setEditingChord({ index: i, root: chord.root, type: chord.type })
-                      }}
-                    >
-                      <Pencil size={10} />
-                    </div>
-                  </button>
-                ))}
-              </div>
+                    <Pencil size={10} />
+                  </div>
+                </button>
+              ))}
+            </div>
 
-              {/* Visualizer */}
-              <div className="h-12 flex items-end justify-center gap-[2px] bg-[#1A1A1A] p-2 border border-[#1A1A1A]">
-                {visualizerData.map((height, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 bg-[#F04E23]"
-                    style={{ height: `${height}%`, minHeight: "8%" }}
-                  />
-                ))}
-              </div>
+            {/* Visualizer */}
+            <div className="h-14 flex items-end justify-center gap-[2px] bg-[#1A1A1A] p-2 border border-[#1A1A1A]">
+              {visualizerData.map((height, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 bg-[#F04E23]"
+                  style={{ height: `${height}%`, minHeight: "8%" }}
+                />
+              ))}
             </div>
           </div>
 
           {/* Controls Section */}
-          <div className="p-3 pt-0">
-            {/* Control Row Labels */}
-            <div className="grid grid-cols-6 gap-2 mb-2 mono-label text-[9px] text-[#666] px-1">
-              <span>KEY</span>
-              <span>MODE</span>
-              <span>STYLE</span>
-              <span>BPM</span>
-              <span>TIME</span>
-              <span>BARS</span>
-            </div>
-
-            {/* Main Control Row */}
-            <div className="grid grid-cols-6 gap-2 mb-3">
-              {/* Key */}
-              <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                <select
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                >
-                  {NOTES.map((n) => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </select>
+          <div className="p-3 pt-2">
+            {/* Row 1: Composition Controls */}
+            <div className="mb-3">
+              <div className="grid grid-cols-6 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
+                <span>KEY</span>
+                <span>MODE</span>
+                <span>STYLE</span>
+                <span>BPM</span>
+                <span>TIME</span>
+                <span>BARS</span>
               </div>
-
-              {/* Mode */}
-              <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                <select
-                  value={mode}
-                  onChange={(e) => setMode(e.target.value)}
-                  className="w-full bg-transparent px-1 py-2.5 text-[10px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                >
-                  <option value="major">Maj</option>
-                  <option value="minor">Min</option>
-                  <option value="dorian">Dor</option>
-                  <option value="mixolydian">Mix</option>
-                  <option value="lydian">Lyd</option>
-                  <option value="phrygian">Phr</option>
-                  <option value="locrian">Loc</option>
-                  <option value="aeolian">Aeo</option>
-                  <option value="harmonicMinor">Hrm</option>
-                  <option value="melodicMinor">Mel</option>
-                  <option value="wholeTone">Whl</option>
-                  <option value="blues">Blu</option>
-                  <option value="pentatonicMajor">Pn+</option>
-                  <option value="pentatonicMinor">Pn-</option>
-                  <option value="hungarian">Hun</option>
-                  <option value="japanese">Jpn</option>
-                  <option value="arabian">Arb</option>
-                  <option value="persian">Per</option>
-                  <option value="bebop">Bop</option>
-                </select>
-              </div>
-
-              {/* Style */}
-              <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                <select
-                  value={style}
-                  onChange={(e) => setStyle(e.target.value)}
-                  className="w-full bg-transparent px-1 py-2.5 text-[10px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                >
-                  <option value="modern">Pop</option>
-                  <option value="electronic">Elec</option>
-                  <option value="ambient">Amb</option>
-                  <option value="jazzy">Jazz</option>
-                  <option value="lofi">Lofi</option>
-                  <option value="cinematic">Cine</option>
-                  <option value="rnb">R&B</option>
-                  <option value="gospel">Gosp</option>
-                  <option value="funk">Funk</option>
-                  <option value="indie">Indi</option>
-                  <option value="bossa">Boss</option>
-                  <option value="reggaeton">Regt</option>
-                  <option value="country">Ctry</option>
-                  <option value="metal">Metl</option>
-                  <option value="classical">Clsc</option>
-                  <option value="disco">Disc</option>
-                  <option value="synthwave">Synw</option>
-                  <option value="edm">EDM</option>
-                  <option value="latin">Latn</option>
-                  <option value="afrobeat">Afro</option>
-                </select>
-              </div>
-
-              {/* BPM */}
-              <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                <input
-                  type="number"
-                  value={bpmInput}
-                  onChange={(e) => {
-                    const val = e.target.value
-                    setBpmInput(val)
-                    const num = parseInt(val)
-                    if (!isNaN(num)) {
-                      if (num >= 1 && num <= 999) {
-                        setSettings((s) => ({ ...s, bpm: num }))
+              <div className="grid grid-cols-6 gap-2">
+                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
+                  <select
+                    value={key}
+                    onChange={(e) => setKey(e.target.value)}
+                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                  >
+                    {NOTES.map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
+                  <select
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value)}
+                    className="w-full bg-transparent px-0.5 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                  >
+                    <option value="major">Maj</option>
+                    <option value="minor">Min</option>
+                    <option value="dorian">Dor</option>
+                    <option value="mixolydian">Mix</option>
+                    <option value="lydian">Lyd</option>
+                    <option value="phrygian">Phr</option>
+                    <option value="locrian">Loc</option>
+                    <option value="aeolian">Aeo</option>
+                    <option value="harmonicMinor">Hrm</option>
+                    <option value="melodicMinor">Mel</option>
+                    <option value="wholeTone">Whl</option>
+                    <option value="blues">Blu</option>
+                    <option value="pentatonicMajor">Pn+</option>
+                    <option value="pentatonicMinor">Pn-</option>
+                    <option value="hungarian">Hun</option>
+                    <option value="japanese">Jpn</option>
+                    <option value="arabian">Arb</option>
+                    <option value="persian">Per</option>
+                    <option value="bebop">Bop</option>
+                  </select>
+                </div>
+                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
+                  <select
+                    value={style}
+                    onChange={(e) => setStyle(e.target.value)}
+                    className="w-full bg-transparent px-0.5 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                  >
+                    <option value="modern">Pop</option>
+                    <option value="electronic">Elec</option>
+                    <option value="ambient">Amb</option>
+                    <option value="jazzy">Jazz</option>
+                    <option value="lofi">Lofi</option>
+                    <option value="cinematic">Cine</option>
+                    <option value="rnb">R&B</option>
+                    <option value="gospel">Gosp</option>
+                    <option value="funk">Funk</option>
+                    <option value="indie">Indi</option>
+                    <option value="bossa">Boss</option>
+                    <option value="reggaeton">Regt</option>
+                    <option value="country">Ctry</option>
+                    <option value="metal">Metl</option>
+                    <option value="classical">Clsc</option>
+                    <option value="disco">Disc</option>
+                    <option value="synthwave">Synw</option>
+                    <option value="edm">EDM</option>
+                    <option value="latin">Latn</option>
+                    <option value="afrobeat">Afro</option>
+                  </select>
+                </div>
+                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
+                  <input
+                    type="number"
+                    value={bpmInput}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setBpmInput(val)
+                      const num = parseInt(val)
+                      if (!isNaN(num)) {
+                        if (num >= 1 && num <= 999) {
+                          setSettings((s) => ({ ...s, bpm: num }))
+                        }
                       }
-                    }
-                  }}
-                  onBlur={() => {
-                    const num = parseInt(bpmInput)
-                    const clamped = Math.max(40, Math.min(200, num || 90))
-                    setSettings((s) => ({ ...s, bpm: clamped }))
-                    setBpmInput(clamped.toString())
-                  }}
-                  min={40}
-                  max={200}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm font-[700] text-center focus:outline-none font-mono"
-                />
-              </div>
-
-              {/* Time Signature */}
-              <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                <select
-                  value={settings.timeSignature}
-                  onChange={(e) => setSettings((s) => ({ ...s, timeSignature: parseInt(e.target.value) }))}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                >
-                  <option value="4">4/4</option>
-                  <option value="3">3/4</option>
-                  <option value="6">6/8</option>
-                </select>
-              </div>
-
-              {/* Bars */}
-              <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
-                <select
-                  value={settings.barsPerChord}
-                  onChange={(e) => setSettings((s) => ({ ...s, barsPerChord: parseInt(e.target.value) }))}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                >
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="4">4</option>
-                </select>
+                    }}
+                    onBlur={() => {
+                      const num = parseInt(bpmInput)
+                      const clamped = Math.max(40, Math.min(200, num || 90))
+                      setSettings((s) => ({ ...s, bpm: clamped }))
+                      setBpmInput(clamped.toString())
+                    }}
+                    min={40}
+                    max={200}
+                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] text-center focus:outline-none font-mono"
+                  />
+                </div>
+                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
+                  <select
+                    value={settings.timeSignature}
+                    onChange={(e) => setSettings((s) => ({ ...s, timeSignature: parseInt(e.target.value) }))}
+                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                  >
+                    <option value="4">4/4</option>
+                    <option value="3">3/4</option>
+                    <option value="6">6/8</option>
+                  </select>
+                </div>
+                <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
+                  <select
+                    value={settings.barsPerChord}
+                    onChange={(e) => setSettings((s) => ({ ...s, barsPerChord: parseInt(e.target.value) }))}
+                    className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                  >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* Sound Controls */}
-            <div className="grid grid-cols-4 gap-2 mb-3">
-              <div>
-                <div className="mono-label text-[9px] text-[#666] mb-1 px-1">SYNTH</div>
+            {/* Row 2: Sound & Mix Controls */}
+            <div className="mb-3">
+              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 mb-1.5 mono-label text-[8px] text-[#666] px-0.5">
+                <span>SYNTH</span>
+                <span>RHYTHM</span>
+                <span>DRUMS</span>
+                <span>REVERB</span>
+                <span className="hidden sm:block"></span>
+                <span className="hidden sm:block"></span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
                 <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
                   <select
                     value={settings.synthType}
                     onChange={(e) => setSettings((s) => ({ ...s, synthType: e.target.value }))}
-                    className="w-full bg-transparent px-2 py-2 text-[10px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
                   >
                     <option value="pad">Pad</option>
                     <option value="pluck">Pluck</option>
@@ -2014,30 +2034,22 @@ export default function ChordGenerator() {
                     <option value="wobble">Wobb</option>
                   </select>
                 </div>
-              </div>
-
-              <div>
-                <div className="mono-label text-[9px] text-[#666] mb-1 px-1">RHYTHM</div>
                 <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
                   <select
                     value={settings.synthRhythm}
                     onChange={(e) => setSettings((s) => ({ ...s, synthRhythm: e.target.value }))}
-                    className="w-full bg-transparent px-2 py-2 text-[10px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
                   >
                     {Object.entries(SYNTH_RHYTHMS).map(([k, { name }]) => (
                       <option key={k} value={k}>{name}</option>
                     ))}
                   </select>
                 </div>
-              </div>
-
-              <div>
-                <div className="mono-label text-[9px] text-[#666] mb-1 px-1">DRUMS</div>
                 <div className="bg-[#F5F5F3] border border-[#CCCCCC]">
                   <select
                     value={settings.drumStyle}
                     onChange={(e) => setSettings((s) => ({ ...s, drumStyle: e.target.value }))}
-                    className="w-full bg-transparent px-2 py-2 text-[10px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                    className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
                   >
                     <option value="basic">Basic</option>
                     <option value="hiphop">HpHop</option>
@@ -2051,10 +2063,6 @@ export default function ChordGenerator() {
                     <option value="none">None</option>
                   </select>
                 </div>
-              </div>
-
-              <div>
-                <div className="mono-label text-[9px] text-[#666] mb-1 px-1">REVERB</div>
                 <div className="bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-1.5">
                   <input
                     type="range"
@@ -2065,142 +2073,106 @@ export default function ChordGenerator() {
                     className="w-full"
                   />
                 </div>
+
+                {/* Volume sliders — inline on row on desktop, wrap on mobile */}
+                <div className="flex items-center gap-2 bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-1.5 col-span-2 sm:col-span-2">
+                  <span className="mono-label text-[8px] text-[#666] shrink-0">CH VOL</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={settings.chordVolume * 100}
+                    onChange={(e) => setSettings((s) => ({ ...s, chordVolume: parseInt(e.target.value) / 100 }))}
+                    className="flex-1"
+                  />
+                  <span className="mono-label text-[8px] text-[#666] shrink-0">DR VOL</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={settings.drumVolume * 100}
+                    onChange={(e) => setSettings((s) => ({ ...s, drumVolume: parseInt(e.target.value) / 100 }))}
+                    className="flex-1"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Volume Controls */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="mono-label text-[9px] text-[#666] w-12">CHORD</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={settings.chordVolume * 100}
-                  onChange={(e) => setSettings((s) => ({ ...s, chordVolume: parseInt(e.target.value) / 100 }))}
-                  className="flex-1"
-                />
+            {/* Row 3: Togggles + Actions */}
+            <div className="mb-3">
+              <div className="flex flex-wrap gap-1.5">
+                {/* Toggles */}
+                <button
+                  onClick={() => setSettings((s) => ({ ...s, drumsEnabled: !s.drumsEnabled }))}
+                  className={`px-3 py-1.5 mono-label text-[9px] transition-all border
+                    ${settings.drumsEnabled 
+                      ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
+                      : "bg-[#F5F5F3] text-[#666] border-[#CCCCCC]"
+                    }`}
+                >
+                  DRUMS {settings.drumsEnabled ? "ON" : "OFF"}
+                </button>
+                <button
+                  onClick={() => setSettings((s) => ({ ...s, metronomeEnabled: !s.metronomeEnabled }))}
+                  className={`px-3 py-1.5 mono-label text-[9px] transition-all border
+                    ${settings.metronomeEnabled 
+                      ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
+                      : "bg-[#F5F5F3] text-[#666] border-[#CCCCCC]"
+                    }`}
+                >
+                  CLICK {settings.metronomeEnabled ? "ON" : "OFF"}
+                </button>
+
+                <span className="w-[1px] bg-[#CCCCCC] mx-1 self-stretch" />
+
+                {/* Actions */}
+                <button
+                  onClick={exportProgression}
+                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                >
+                  COPY
+                </button>
+                <button
+                  onClick={saveProgression}
+                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                >
+                  SAVE
+                </button>
+                <button
+                  onClick={exportMidi}
+                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                >
+                  EXPORT
+                </button>
+
+                <span className="w-[1px] bg-[#CCCCCC] mx-1 self-stretch" />
+
+                {/* Utility */}
+                <button
+                  onClick={generateProgression}
+                  className="px-3 py-1.5 bg-[#111111] text-[#F5F5F3] border border-[#111111] mono-label text-[9px] hover:bg-[#1A1A1A] transition-colors"
+                >
+                  REGEN
+                </button>
+                <button
+                  onClick={resetSettings}
+                  className="px-3 py-1.5 bg-[#F5F5F3] border border-[#CCCCCC] mono-label text-[9px] hover:bg-[#EBEBEB] transition-colors"
+                >
+                  RESET
+                </button>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="mono-label text-[9px] text-[#666] w-12">DRUM</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={settings.drumVolume * 100}
-                  onChange={(e) => setSettings((s) => ({ ...s, drumVolume: parseInt(e.target.value) / 100 }))}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-
-            {/* Toggle Buttons */}
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={() => setSettings((s) => ({ ...s, drumsEnabled: !s.drumsEnabled }))}
-                className={`flex-1 px-3 py-2 mono-label text-[10px] transition-all border
-                  ${settings.drumsEnabled 
-                    ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
-                    : "bg-[#F5F5F3] text-[#666] border-[#CCCCCC]"
-                  }`}
-              >
-                DRUMS {settings.drumsEnabled ? "ON" : "OFF"}
-              </button>
-              <button
-                onClick={() => setSettings((s) => ({ ...s, metronomeEnabled: !s.metronomeEnabled }))}
-                className={`flex-1 px-3 py-2 mono-label text-[10px] transition-all border
-                  ${settings.metronomeEnabled 
-                    ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
-                    : "bg-[#F5F5F3] text-[#666] border-[#CCCCCC]"
-                  }`}
-              >
-                CLICK {settings.metronomeEnabled ? "ON" : "OFF"}
-              </button>
-            </div>
-
-            {/* Action Buttons Row */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              <button
-                onClick={exportProgression}
-                className="flex-1 min-w-[60px] bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-2.5 mono-label text-[10px] hover:bg-[#EBEBEB] transition-colors"
-              >
-                COPY
-              </button>
-              <button
-                onClick={saveProgression}
-                className="flex-1 min-w-[60px] bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-2.5 mono-label text-[10px] hover:bg-[#EBEBEB] transition-colors"
-              >
-                SAVE
-              </button>
-              <button
-                onClick={exportMidi}
-                className="flex-1 min-w-[60px] bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-2.5 mono-label text-[10px] hover:bg-[#EBEBEB] transition-colors"
-              >
-                EXPORT
-              </button>
-              <button
-                onClick={generateProgression}
-                className="flex-1 min-w-[60px] bg-[#111111] text-[#F5F5F3] border border-[#111111] px-2 py-2.5 mono-label text-[10px] hover:bg-[#1A1A1A] transition-colors"
-              >
-                REGEN
-              </button>
-              <button
-                onClick={resetSettings}
-                className="flex-1 min-w-[60px] bg-[#F5F5F3] border border-[#CCCCCC] px-2 py-2.5 mono-label text-[10px] hover:bg-[#EBEBEB] transition-colors"
-              >
-                RESET
-              </button>
-            </div>
-
-            {/* Main Transport */}
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={isPlaying ? stopPlayback : startPlayback}
-                className={`flex items-center justify-center gap-2 py-4 font-[700] uppercase text-sm tracking-widest transition-all
-                  ${isPlaying 
-                    ? "bg-[#F04E23] orange-panel text-[#111111]" 
-                    : "bg-[#111111] text-[#F5F5F3] hover:bg-[#1A1A1A]"
-                  }`}
-              >
-                {isPlaying ? (
-                  <>
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="6" y="4" width="4" height="16" />
-                      <rect x="14" y="4" width="4" height="16" />
-                    </svg>
-                    STOP
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    PLAY
-                  </>
-                )}
-              </button>
-              <button
-                onClick={generateProgression}
-                className="flex items-center justify-center gap-2 py-4 bg-[#F5F5F3] border border-[#CCCCCC] font-[700] uppercase text-sm tracking-widest hover:bg-[#EBEBEB] transition-colors"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M23 4v6h-6M1 20v-6h6" />
-                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-                </svg>
-                GENERATE
-              </button>
             </div>
 
             {/* Saved Progressions */}
             {savedProgressions.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-[#CCCCCC]">
-                <div className="mono-label text-[9px] text-[#666] mb-2">SAVED ///</div>
+              <div className="pt-2 border-t border-[#CCCCCC]">
+                <div className="mono-label text-[8px] text-[#666] mb-1.5">SAVED ///</div>
                 <div className="flex flex-wrap gap-1">
                   {savedProgressions.map((saved, i) => (
                     <div key={i} className="group relative flex items-center">
                       <button
                         onClick={() => loadProgression(saved)}
-                        className="bg-[#F5F5F3] border border-[#CCCCCC] pl-2 pr-6 py-1 mono-label text-[9px] hover:border-[#F04E23] transition-colors"
+                        className="bg-[#F5F5F3] border border-[#CCCCCC] pl-2 pr-6 py-1 mono-label text-[8px] hover:border-[#F04E23] transition-colors"
                       >
                         {saved.chords.map((c) => c.name).join(" ")}
                       </button>
@@ -2211,7 +2183,7 @@ export default function ChordGenerator() {
                         }}
                         className="absolute right-1 p-0.5 text-[#666] hover:text-[#F04E23] transition-colors"
                       >
-                        <X size={10} />
+                        <X size={8} />
                       </button>
                     </div>
                   ))}
