@@ -1367,51 +1367,102 @@ export default function ChordGenerator() {
   const playKick = useCallback((time: number) => {
     if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
-    const vol = settingsRef.current.drumVolume * 0.9
+    const vol = settingsRef.current.drumVolume * 1.0
 
-    // Layer 1: Sub sine (fat low end)
+    // Layer 1: Sub sine (fat low end) — rounder, slower decay
     const subOsc = audioCtxRef.current.createOscillator()
     const subGain = audioCtxRef.current.createGain()
     subOsc.type = "sine"
-    subOsc.frequency.setValueAtTime(80, time)
-    subOsc.frequency.exponentialRampToValueAtTime(35, time + 0.15)
-    subGain.gain.setValueAtTime(vol * 0.8, time)
-    subGain.gain.exponentialRampToValueAtTime(0.001, time + 0.35)
+    subOsc.frequency.setValueAtTime(100, time)
+    subOsc.frequency.exponentialRampToValueAtTime(35, time + 0.2)
+    subGain.gain.setValueAtTime(vol * 0.9, time)
+    subGain.gain.exponentialRampToValueAtTime(0.001, time + 0.45)
     subOsc.connect(subGain)
 
-    // Layer 2: Punch body (mid click)
+    // Layer 2: Body (warm triangle) — less click, more thud
     const bodyOsc = audioCtxRef.current.createOscillator()
     const bodyGain = audioCtxRef.current.createGain()
-    bodyOsc.type = "triangle"
-    bodyOsc.frequency.setValueAtTime(200, time)
-    bodyOsc.frequency.exponentialRampToValueAtTime(60, time + 0.08)
-    bodyGain.gain.setValueAtTime(vol * 1.0, time)
-    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15)
+    bodyOsc.type = "sine"
+    bodyOsc.frequency.setValueAtTime(150, time)
+    bodyOsc.frequency.exponentialRampToValueAtTime(50, time + 0.1)
+    bodyGain.gain.setValueAtTime(vol * 0.6, time)
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.25)
     bodyOsc.connect(bodyGain)
-
-    // Layer 3: Click transient (noise burst)
-    const clickLen = audioCtxRef.current.sampleRate * 0.008
-    const clickBuffer = audioCtxRef.current.createBuffer(1, clickLen, audioCtxRef.current.sampleRate)
-    const clickData = clickBuffer.getChannelData(0)
-    for (let i = 0; i < clickLen; i++) {
-      clickData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / clickLen, 4)
-    }
-    const clickSource = audioCtxRef.current.createBufferSource()
-    clickSource.buffer = clickBuffer
-    const clickGain = audioCtxRef.current.createGain()
-    clickGain.gain.setValueAtTime(vol * 0.6, time)
-    clickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.01)
-    clickSource.connect(clickGain)
 
     // Sum layers
     const sumGain = audioCtxRef.current.createGain()
     subGain.connect(sumGain)
     bodyGain.connect(sumGain)
-    clickGain.connect(sumGain)
+
+    // Round it off with a gentle lowpass
+    const filter = audioCtxRef.current.createBiquadFilter()
+    filter.type = "lowpass"
+    filter.frequency.value = 300
+
+    sumGain.connect(filter)
 
     const dryGain = audioCtxRef.current.createGain()
     const wetGain = audioCtxRef.current.createGain()
-    const reverbAmount = settingsRef.current.reverbAmount * 0.1
+    const reverbAmount = settingsRef.current.reverbAmount * 0.25
+
+    dryGain.gain.value = 1 - reverbAmount
+    wetGain.gain.value = reverbAmount
+
+    filter.connect(dryGain)
+    filter.connect(wetGain)
+    dryGain.connect(masterGainRef.current)
+    wetGain.connect(reverbNodeRef.current)
+
+    activeNodesRef.current.push(...[subOsc, bodyOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
+    subOsc.start(time)
+    bodyOsc.start(time)
+    subOsc.stop(time + 0.5)
+    bodyOsc.stop(time + 0.3)
+  }, [])
+
+  const playSnare = useCallback((time: number) => {
+    if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
+
+    const vol = settingsRef.current.drumVolume * 0.9
+
+    // Layer 1: Warmer body tone (rounded sine instead of triangle)
+    const toneOsc = audioCtxRef.current.createOscillator()
+    const toneGain = audioCtxRef.current.createGain()
+    toneOsc.type = "sine"
+    toneOsc.frequency.setValueAtTime(200, time)
+    toneOsc.frequency.exponentialRampToValueAtTime(100, time + 0.15)
+    toneGain.gain.setValueAtTime(vol * 0.5, time)
+    toneGain.gain.exponentialRampToValueAtTime(0.001, time + 0.2)
+    toneOsc.connect(toneGain)
+
+    // Layer 2: Noise body (main snare sound) — less high-end, more body
+    const noiseLen = audioCtxRef.current.sampleRate * 0.2
+    const noiseBuffer = audioCtxRef.current.createBuffer(1, noiseLen, audioCtxRef.current.sampleRate)
+    const noiseData = noiseBuffer.getChannelData(0)
+    for (let i = 0; i < noiseLen; i++) {
+      noiseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, 1.5)
+    }
+    const noiseSource = audioCtxRef.current.createBufferSource()
+    noiseSource.buffer = noiseBuffer
+    // Bandpass for warmer snare — cuts both low rumble and harsh highs
+    const noiseFilter = audioCtxRef.current.createBiquadFilter()
+    noiseFilter.type = "bandpass"
+    noiseFilter.frequency.value = 800
+    noiseFilter.Q.value = 0.8
+    const noiseGain = audioCtxRef.current.createGain()
+    noiseGain.gain.setValueAtTime(vol * 0.7, time)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.2)
+    noiseSource.connect(noiseFilter)
+    noiseFilter.connect(noiseGain)
+
+    // Sum layers
+    const sumGain = audioCtxRef.current.createGain()
+    toneGain.connect(sumGain)
+    noiseGain.connect(sumGain)
+
+    const dryGain = audioCtxRef.current.createGain()
+    const wetGain = audioCtxRef.current.createGain()
+    const reverbAmount = settingsRef.current.reverbAmount * 0.4
 
     dryGain.gain.value = 1 - reverbAmount
     wetGain.gain.value = reverbAmount
@@ -1421,70 +1472,55 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(...[subOsc, bodyOsc, clickSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
-    subOsc.start(time)
-    bodyOsc.start(time)
-    clickSource.start(time)
-    subOsc.stop(time + 0.4)
-    bodyOsc.stop(time + 0.2)
+    activeNodesRef.current.push(...[toneOsc, noiseSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
+    toneOsc.start(time)
+    noiseSource.start(time)
+    toneOsc.stop(time + 0.25)
   }, [])
 
-  const playSnare = useCallback((time: number) => {
+  const playHiHat = useCallback((time: number, open: boolean = false) => {
     if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
-    const vol = settingsRef.current.drumVolume * 0.8
+    const vol = settingsRef.current.drumVolume * (open ? 0.35 : 0.4)
+    const hiLen = open ? 0.3 : 0.06
 
-    // Layer 1: Snare body (tone)
-    const toneOsc = audioCtxRef.current.createOscillator()
-    const toneGain = audioCtxRef.current.createGain()
-    toneOsc.type = "triangle"
-    toneOsc.frequency.setValueAtTime(240, time)
-    toneOsc.frequency.exponentialRampToValueAtTime(120, time + 0.08)
-    toneGain.gain.setValueAtTime(vol * 0.7, time)
-    toneGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12)
-    toneOsc.connect(toneGain)
-
-    // Layer 2: Snappy noise (high-frequency crack)
-    const snapLen = audioCtxRef.current.sampleRate * 0.04
-    const snapBuffer = audioCtxRef.current.createBuffer(1, snapLen, audioCtxRef.current.sampleRate)
-    const snapData = snapBuffer.getChannelData(0)
-    for (let i = 0; i < snapLen; i++) {
-      snapData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / snapLen, 6)
-    }
-    const snapSource = audioCtxRef.current.createBufferSource()
-    snapSource.buffer = snapBuffer
-    const snapFilter = audioCtxRef.current.createBiquadFilter()
-    snapFilter.type = "highpass"
-    snapFilter.frequency.value = 3000
-    const snapGain = audioCtxRef.current.createGain()
-    snapGain.gain.setValueAtTime(vol * 0.5, time)
-    snapGain.gain.exponentialRampToValueAtTime(0.001, time + 0.03)
-    snapSource.connect(snapFilter)
-    snapFilter.connect(snapGain)
-
-    // Layer 3: Noise body (full snare sound)
-    const noiseLen = audioCtxRef.current.sampleRate * 0.15
-    const noiseBuffer = audioCtxRef.current.createBuffer(1, noiseLen, audioCtxRef.current.sampleRate)
-    const noiseData = noiseBuffer.getChannelData(0)
-    for (let i = 0; i < noiseLen; i++) {
-      noiseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, 2)
+    // Layer 1: Filtered noise (main hat sound) — warmer bandpass, slower decay
+    const noiseLen = audioCtxRef.current.sampleRate * hiLen
+    const noiseBuffer = audioCtxRef.current.createBuffer(2, noiseLen, audioCtxRef.current.sampleRate)
+    for (let ch = 0; ch < 2; ch++) {
+      const channelData = noiseBuffer.getChannelData(ch)
+      for (let i = 0; i < noiseLen; i++) {
+        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, open ? 1.2 : 4)
+      }
     }
     const noiseSource = audioCtxRef.current.createBufferSource()
     noiseSource.buffer = noiseBuffer
-    const noiseFilter = audioCtxRef.current.createBiquadFilter()
-    noiseFilter.type = "highpass"
-    noiseFilter.frequency.value = 400
-    const noiseGain = audioCtxRef.current.createGain()
-    noiseGain.gain.setValueAtTime(vol * 0.6, time)
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12)
-    noiseSource.connect(noiseFilter)
-    noiseFilter.connect(noiseGain)
 
-    // Sum layers
+    // Lower bandpass for warmer tone — less piercing
+    const bpFilter = audioCtxRef.current.createBiquadFilter()
+    bpFilter.type = "bandpass"
+    bpFilter.frequency.value = open ? 4000 : 6000
+    bpFilter.Q.value = open ? 1.0 : 0.6
+
+    const hiGain = audioCtxRef.current.createGain()
+    hiGain.gain.setValueAtTime(vol, time)
+    hiGain.gain.exponentialRampToValueAtTime(0.001, time + hiLen)
+
+    noiseSource.connect(bpFilter)
+    bpFilter.connect(hiGain)
+
+    // Layer 2: Subtle body tone (lower sine for warmth)
+    const bodyOsc = audioCtxRef.current.createOscillator()
+    const bodyGain = audioCtxRef.current.createGain()
+    bodyOsc.type = "sine"
+    bodyOsc.frequency.value = open ? 2500 : 5000
+    bodyGain.gain.setValueAtTime(vol * 0.15, time)
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + (open ? 0.15 : 0.02))
+    bodyOsc.connect(bodyGain)
+
     const sumGain = audioCtxRef.current.createGain()
-    toneGain.connect(sumGain)
-    snapGain.connect(sumGain)
-    noiseGain.connect(sumGain)
+    hiGain.connect(sumGain)
+    bodyGain.connect(sumGain)
 
     const dryGain = audioCtxRef.current.createGain()
     const wetGain = audioCtxRef.current.createGain()
@@ -1498,73 +1534,10 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(...[toneOsc, snapSource, noiseSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
-    toneOsc.start(time)
-    snapSource.start(time)
+    activeNodesRef.current.push(...[noiseSource, bodyOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
     noiseSource.start(time)
-    toneOsc.stop(time + 0.15)
-  }, [])
-
-  const playHiHat = useCallback((time: number, open: boolean = false) => {
-    if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
-
-    const vol = settingsRef.current.drumVolume * (open ? 0.3 : 0.35)
-    const hiLen = open ? 0.25 : 0.04
-
-    // Layer 1: Filtered noise (main hat sound)
-    const noiseLen = audioCtxRef.current.sampleRate * hiLen
-    const noiseBuffer = audioCtxRef.current.createBuffer(2, noiseLen, audioCtxRef.current.sampleRate)
-    for (let ch = 0; ch < 2; ch++) {
-      const channelData = noiseBuffer.getChannelData(ch)
-      for (let i = 0; i < noiseLen; i++) {
-        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, open ? 1.5 : 8)
-      }
-    }
-    const noiseSource = audioCtxRef.current.createBufferSource()
-    noiseSource.buffer = noiseBuffer
-
-    // Bandpass for more metallic tone
-    const bpFilter = audioCtxRef.current.createBiquadFilter()
-    bpFilter.type = "bandpass"
-    bpFilter.frequency.value = open ? 6000 : 8000
-    bpFilter.Q.value = open ? 1.5 : 0.8
-
-    const hiGain = audioCtxRef.current.createGain()
-    hiGain.gain.setValueAtTime(vol, time)
-    hiGain.gain.exponentialRampToValueAtTime(0.001, time + hiLen)
-
-    noiseSource.connect(bpFilter)
-    bpFilter.connect(hiGain)
-
-    // Layer 2: Metallic ring (sine burst for tone)
-    const ringOsc = audioCtxRef.current.createOscillator()
-    const ringGain = audioCtxRef.current.createGain()
-    ringOsc.type = "sine"
-    ringOsc.frequency.value = open ? 4500 : 7500
-    ringGain.gain.setValueAtTime(vol * 0.3, time)
-    ringGain.gain.exponentialRampToValueAtTime(0.001, time + (open ? 0.12 : 0.015))
-    ringOsc.connect(ringGain)
-
-    const sumGain = audioCtxRef.current.createGain()
-    hiGain.connect(sumGain)
-    ringGain.connect(sumGain)
-
-    const dryGain = audioCtxRef.current.createGain()
-    const wetGain = audioCtxRef.current.createGain()
-    const reverbAmount = settingsRef.current.reverbAmount * 0.2
-
-    dryGain.gain.value = 1 - reverbAmount
-    wetGain.gain.value = reverbAmount
-
-    sumGain.connect(dryGain)
-    sumGain.connect(wetGain)
-    dryGain.connect(masterGainRef.current)
-    wetGain.connect(reverbNodeRef.current)
-
-    activeNodesRef.current.push(...[noiseSource, ringOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
-    noiseSource.start(time)
-    ringOsc.start(time)
-    ringOsc.stop(time + (open ? 0.15 : 0.02))
+    bodyOsc.start(time)
+    bodyOsc.stop(time + (open ? 0.18 : 0.03))
   }, [])
 
   
