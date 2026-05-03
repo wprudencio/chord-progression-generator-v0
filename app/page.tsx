@@ -847,7 +847,9 @@ export default function ChordGenerator() {
   }, [createReverb])
 
   const stopAllNodes = useCallback(() => {
-    activeNodesRef.current.forEach((node) => {
+    const nodes = activeNodesRef.current
+    activeNodesRef.current = [] // Clear immediately to prevent stale refs
+    nodes.forEach((node) => {
       try {
         node.stop()
         node.disconnect()
@@ -855,7 +857,6 @@ export default function ChordGenerator() {
         // Node might already be stopped
       }
     })
-    activeNodesRef.current = []
   }, [])
 
     const playSingleNote = useCallback((freq: number, time: number, duration: number, synthType: string) => {
@@ -909,7 +910,7 @@ export default function ChordGenerator() {
         applyReverb(gain)
 
         oscs.forEach((osc) => {
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -939,7 +940,7 @@ export default function ChordGenerator() {
         filter.connect(gain)
         applyReverb(gain)
 
-        activeNodesRef.current.push(osc, osc2)
+        activeNodesRef.current.push(...[osc, osc2].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
         osc.start(time)
         osc2.start(time)
         osc.stop(time + duration)
@@ -973,7 +974,7 @@ export default function ChordGenerator() {
         filter.connect(gain)
         applyReverb(gain)
 
-        activeNodesRef.current.push(osc1, osc2, osc3)
+        activeNodesRef.current.push(...[osc1, osc2, osc3].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
         osc1.start(time)
         osc2.start(time)
         osc3.start(time)
@@ -1008,7 +1009,7 @@ export default function ChordGenerator() {
         applyReverb(gain)
 
         oscs.forEach((osc) => {
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -1037,7 +1038,7 @@ export default function ChordGenerator() {
           hGain.gain.value = harmonicGains[i]
           osc.connect(hGain)
           hGain.connect(filter)
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -1064,7 +1065,7 @@ export default function ChordGenerator() {
           osc.connect(g)
           applyReverb(g)
 
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -1106,7 +1107,7 @@ export default function ChordGenerator() {
         gain.connect(shaper)
         applyReverb(shaper)
 
-        activeNodesRef.current.push(sub, punch)
+        activeNodesRef.current.push(...[sub, punch].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
         sub.start(time)
         punch.start(time)
         sub.stop(time + duration)
@@ -1140,7 +1141,7 @@ export default function ChordGenerator() {
         applyReverb(gain)
 
         oscs.forEach((osc) => {
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -1174,7 +1175,7 @@ export default function ChordGenerator() {
         applyReverb(gain)
 
         oscs.forEach((osc) => {
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -1210,7 +1211,7 @@ export default function ChordGenerator() {
         filter.connect(gain)
         applyReverb(gain)
 
-        activeNodesRef.current.push(carrier, modulator)
+        activeNodesRef.current.push(...[carrier, modulator].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
         carrier.start(time)
         modulator.start(time)
         carrier.stop(time + duration)
@@ -1245,7 +1246,7 @@ export default function ChordGenerator() {
         applyReverb(gain)
 
         oscs.forEach((osc) => {
-          activeNodesRef.current.push(osc)
+          activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
           osc.start(time)
           osc.stop(time + duration)
         })
@@ -1293,7 +1294,7 @@ export default function ChordGenerator() {
         filter2.connect(gain)
         applyReverb(gain)
 
-        activeNodesRef.current.push(osc, osc2, lfo)
+        activeNodesRef.current.push(...[osc, osc2, lfo].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
         osc.start(time)
         osc2.start(time)
         lfo.start(time)
@@ -1410,7 +1411,7 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(subOsc, bodyOsc, clickSource)
+    activeNodesRef.current.push(...[subOsc, bodyOsc, clickSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
     subOsc.start(time)
     bodyOsc.start(time)
     clickSource.start(time)
@@ -1487,7 +1488,7 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(toneOsc, snapSource, noiseSource)
+    activeNodesRef.current.push(...[toneOsc, snapSource, noiseSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
     toneOsc.start(time)
     snapSource.start(time)
     noiseSource.start(time)
@@ -1550,7 +1551,7 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(noiseSource, ringOsc)
+    activeNodesRef.current.push(...[noiseSource, ringOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
     noiseSource.start(time)
     ringOsc.start(time)
     ringOsc.stop(time + (open ? 0.15 : 0.02))
@@ -1571,7 +1572,7 @@ export default function ChordGenerator() {
     osc.connect(gain)
     gain.connect(masterGainRef.current)
 
-    activeNodesRef.current.push(osc)
+    activeNodesRef.current.push(...[osc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
     osc.start(time)
     osc.stop(time + 0.05)
   }, [])
