@@ -716,7 +716,6 @@ export default function ChordGenerator() {
   const [progression, setProgression] = useState<Chord[]>([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [activeChordIndex, setActiveChordIndex] = useState(-1)
-  const [visualizerData, setVisualizerData] = useState<number[]>(new Array(32).fill(4))
   const [savedProgressions, setSavedProgressions] = useState<{ name: string; key: string; mode: string; chords: Chord[] }[]>([])
   const [editingChord, setEditingChord] = useState<{index: number, root: string, type: string} | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -760,7 +759,6 @@ export default function ChordGenerator() {
   const audioCtxRef = useRef<AudioContext | null>(null)
   const masterGainRef = useRef<GainNode | null>(null)
   const reverbNodeRef = useRef<ConvolverNode | null>(null)
-  const analyserRef = useRef<AnalyserNode | null>(null)
   const isPlayingRef = useRef(false)
   const currentChordIndexRef = useRef(0)
   const currentBeatRef = useRef(0)
@@ -825,11 +823,6 @@ export default function ChordGenerator() {
     const limiter = audioCtxRef.current.createGain()
     limiter.gain.value = 1.0
 
-    // Analyser for visualizer
-    analyserRef.current = audioCtxRef.current.createAnalyser()
-    analyserRef.current.fftSize = 1024
-    analyserRef.current.smoothingTimeConstant = 0.6
-
     // Reverb
     reverbNodeRef.current = createReverb()
     if (reverbNodeRef.current) {
@@ -838,8 +831,7 @@ export default function ChordGenerator() {
 
     masterGainRef.current.connect(compressor)
     compressor.connect(limiter)
-    limiter.connect(analyserRef.current)
-    analyserRef.current.connect(audioCtxRef.current.destination)
+    limiter.connect(audioCtxRef.current.destination)
 
     if (audioCtxRef.current.state === "suspended") {
       audioCtxRef.current.resume()
@@ -1767,7 +1759,6 @@ export default function ChordGenerator() {
       audioCtxRef.current = null
       masterGainRef.current = null
       reverbNodeRef.current = null
-      analyserRef.current = null
     }
   }, [stopAllNodes])
 
@@ -1834,40 +1825,7 @@ export default function ChordGenerator() {
     generateProgression()
   }, [generateProgression, isLoaded])
 
-  // Visualizer animation
-  useEffect(() => {
-    let animationFrame: number
-    const dataArray = new Uint8Array(512) // Pre-allocate for 1024 fftSize
 
-    const animate = () => {
-      if (analyserRef.current) {
-        analyserRef.current.getByteFrequencyData(dataArray)
-
-        const bufferLength = analyserRef.current.frequencyBinCount
-        const step = Math.floor(bufferLength / 32)
-        
-        const newData = Array.from({ length: 32 }, (_, i) => {
-          let sum = 0
-          for (let j = 0; j < step; j++) {
-            sum += dataArray[i * step + j]
-          }
-          const average = sum / step
-          // Use a combination of average and peak for better visualization
-          return Math.max(4, (average / 255) * 100)
-        })
-
-        setVisualizerData(newData)
-      }
-
-      animationFrame = requestAnimationFrame(animate)
-    }
-
-    animate()
-
-    return () => {
-      cancelAnimationFrame(animationFrame)
-    }
-  }, [])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -1912,45 +1870,6 @@ export default function ChordGenerator() {
               <span>usb</span>
               <span>power</span>
             </div>
-          </div>
-
-          {/* Transport Bar — Top, always visible */}
-          <div className="grid grid-cols-2 gap-1 m-3 mb-0">
-            <button
-              onClick={isPlaying ? stopPlayback : startPlayback}
-              className={`flex items-center justify-center gap-2 py-5 font-[700] uppercase text-sm tracking-widest transition-all
-                ${isPlaying 
-                  ? "bg-[#F04E23] orange-panel text-[#111111]" 
-                  : "bg-[#111111] text-[#F5F5F3] hover:bg-[#1A1A1A]"
-                }`}
-            >
-              {isPlaying ? (
-                <>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="4" width="4" height="16" />
-                    <rect x="14" y="4" width="4" height="16" />
-                  </svg>
-                  STOP
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  PLAY
-                </>
-              )}
-            </button>
-            <button
-              onClick={generateProgression}
-              className="flex items-center justify-center gap-2 py-5 bg-[#F5F5F3] border border-[#CCCCCC] font-[700] uppercase text-sm tracking-widest hover:bg-[#EBEBEB] transition-all"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 4v6h-6M1 20v-6h6" />
-                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg>
-              GENERATE
-            </button>
           </div>
 
           {/* Main Display Area */}
@@ -2006,15 +1925,43 @@ export default function ChordGenerator() {
               ))}
             </div>
 
-            {/* Visualizer */}
-            <div className="h-14 flex items-end justify-center gap-[2px] bg-[#1A1A1A] p-2 border border-[#1A1A1A]">
-              {visualizerData.map((height, i) => (
-                <div
-                  key={i}
-                  className="w-1.5 bg-[#F04E23]"
-                  style={{ height: `${height}%`, minHeight: "8%" }}
-                />
-              ))}
+            {/* Transport — Play + Generate */}
+            <div className="grid grid-cols-2 gap-[2px]">
+              <button
+                onClick={isPlaying ? stopPlayback : startPlayback}
+                className={`flex items-center justify-center gap-2 py-4 font-[700] uppercase text-sm tracking-widest transition-all
+                  ${isPlaying 
+                    ? "bg-[#F04E23] orange-panel text-[#111111]" 
+                    : "bg-[#1A1A1A] text-[#F5F5F3] hover:bg-[#F04E23] hover:text-[#111111]"
+                  }`}
+              >
+                {isPlaying ? (
+                  <>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16" />
+                      <rect x="14" y="4" width="4" height="16" />
+                    </svg>
+                    STOP
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    PLAY
+                  </>
+                )}
+              </button>
+              <button
+                onClick={generateProgression}
+                className="flex items-center justify-center gap-2 py-4 bg-[#1A1A1A] text-[#F5F5F3] font-[700] uppercase text-sm tracking-widest hover:bg-[#F04E23] hover:text-[#111111] transition-all"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M23 4v6h-6M1 20v-6h6" />
+                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
+                GENERATE
+              </button>
             </div>
           </div>
 
