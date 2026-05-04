@@ -1943,12 +1943,20 @@ export default function ChordGenerator() {
         {/* Device Frame */}
         <div className="bg-[#F5F5F3] border border-[#CCCCCC] overflow-hidden">
           
-          {/* Top Bar — Actions */}
+          {/* Top Bar — CHORD.GEN + Status + Actions */}
           <div className="bg-[#111111] dark-panel px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-[14px] font-[700] text-[#F04E23] tracking-wider mono-label">TEXT LABS</span>
-              <span className="text-[11px] text-[#666] mono-label mx-1">///</span>
-              <span className="text-[11px] text-[#666] mono-label hidden sm:inline">CHORD PROGRESSION COMPOSER</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-[800] tracking-tight text-[#F5F5F3]">CHORD.GEN</span>
+                <span className="brand-stamp text-[11px]">v.02</span>
+              </div>
+              <span className="text-[#333] mx-0.5">|</span>
+              <span className={`w-2 h-2 ${isPlaying ? "bg-[#F04E23]" : "bg-[#666]"}`} />
+              <span className="mono-label text-[11px] text-[#666]">{isPlaying ? "PLAYING" : "STOPPED"}</span>
+              <span className="text-[#333] mx-0.5 hidden sm:inline">|</span>
+              <span className="mono-label text-[11px] text-[#F04E23] font-[700] tabular-nums hidden sm:inline">
+                {String(Math.floor(currentBeatRef.current / (settings.timeSignature * 4)) + 1).padStart(2, "0")}.{String((currentBeatRef.current % (settings.timeSignature * 4)) + 1).padStart(1, "0")}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <button
@@ -1998,21 +2006,7 @@ export default function ChordGenerator() {
 
           {/* Main Display Area */}
           <div className="bg-[#111111] dark-panel m-3 mt-2 p-6 border border-[#CCCCCC]">
-            {/* Status + Product Strip (compact) */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-[800] tracking-tight text-[#F5F5F3]">CHORD.GEN</span>
-                <span className="brand-stamp text-[12px]">v.02</span>
-              </div>
-              <div className="flex items-center gap-3 mono-label text-[14px]">
-                <span className={`w-2 h-2 ${isPlaying ? "bg-[#F04E23]" : "bg-[#666]"}`} />
-                <span className="text-[#666]">{isPlaying ? "PLAYING" : "STOPPED"}</span>
-                <span className="text-[#666] mx-1">|</span>
-                <span className="text-[#F04E23] font-[700] tabular-nums">
-                  {String(Math.floor(currentBeatRef.current / (settings.timeSignature * 4)) + 1).padStart(2, "0")}.{String((currentBeatRef.current % (settings.timeSignature * 4)) + 1).padStart(1, "0")}
-                </span>
-              </div>
-            </div>
+
 
             {/* Chord Display — larger, more prominent */}
             <div className="grid grid-cols-4 gap-1 mb-4">
@@ -2393,7 +2387,7 @@ export default function ChordGenerator() {
           </div>
           {/* Footer */}
           <div className="bg-[#111111] dark-panel px-6 py-3 text-center mono-label text-[12px] text-[#666]">
-            SPACE = PLAY/STOP / R = REGENERATE / S = SAVE
+            SPACE = PLAY/STOP / S = SAVE
           </div>
         </div>
       </div>
