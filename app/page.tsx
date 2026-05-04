@@ -1943,19 +1943,56 @@ export default function ChordGenerator() {
         {/* Device Frame */}
         <div className="bg-[#F5F5F3] border border-[#CCCCCC] overflow-hidden">
           
-          {/* Top Bar — Ports */}
-          <div className="bg-[#111111] dark-panel px-6 py-3 flex items-center justify-between text-[14px] text-[#666] uppercase tracking-[0.2em]">
-            <div className="flex gap-6">
-              <span>output</span>
-              <span className="text-[#F04E23]">input</span>
+          {/* Top Bar — Actions */}
+          <div className="bg-[#111111] dark-panel px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[14px] font-[700] text-[#F04E23] tracking-wider mono-label">TEXT LABS</span>
+              <span className="text-[11px] text-[#666] mono-label mx-1">///</span>
+              <span className="text-[11px] text-[#666] mono-label hidden sm:inline">CHORD PROGRESSION COMPOSER</span>
             </div>
-            <div className="hidden sm:flex gap-6">
-              <span>sync</span>
-              <span>midi</span>
-            </div>
-            <div className="flex gap-6">
-              <span>usb</span>
-              <span>power</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={exportProgression}
+                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                title="Copy progression"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+              </button>
+              <button
+                onClick={saveProgression}
+                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                title="Save progression"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+              </button>
+              <button
+                onClick={exportMidi}
+                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                title="Export MIDI"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </button>
+              <button
+                onClick={resetSettings}
+                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                title="Reset all settings"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -2324,50 +2361,7 @@ export default function ChordGenerator() {
               </div>
             </div>
 
-            {/* PANEL: ACTIONS */}
-            <div className="border-2 border-[#CCCCCC] bg-[#F5F5F3]">
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#EBEBEB] border-b-2 border-[#CCCCCC]">
-                <span className="w-2 h-2 bg-[#F04E23]" />
-                <span className="mono-label text-[14px] text-[#111111] font-[700] tracking-wider">ACTIONS</span>
-                <span className="slash-divider text-[#666]">////</span>
-                <span className="mono-label text-[11px] text-[#666] uppercase">Export &middot; Save &middot; Utility</span>
-              </div>
-              <div className="p-3">
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    onClick={exportProgression}
-                    className="px-5 py-3 bg-white border border-[#CCCCCC] mono-label text-[14px] hover:bg-[#EBEBEB] transition-colors"
-                  >
-                    COPY
-                  </button>
-                  <button
-                    onClick={saveProgression}
-                    className="px-5 py-3 bg-white border border-[#CCCCCC] mono-label text-[14px] hover:bg-[#EBEBEB] transition-colors"
-                  >
-                    SAVE
-                  </button>
-                  <button
-                    onClick={exportMidi}
-                    className="px-5 py-3 bg-white border border-[#CCCCCC] mono-label text-[14px] hover:bg-[#EBEBEB] transition-colors"
-                  >
-                    EXPORT
-                  </button>
-                  <span className="w-[1px] bg-[#CCCCCC] mx-1 self-stretch" />
-                  <button
-                    onClick={generateProgression}
-                    className="px-5 py-3 bg-[#111111] text-[#F5F5F3] border border-[#111111] mono-label text-[14px] hover:bg-[#1A1A1A] transition-colors"
-                  >
-                    REGEN
-                  </button>
-                  <button
-                    onClick={resetSettings}
-                    className="px-5 py-3 bg-white border border-[#CCCCCC] mono-label text-[14px] hover:bg-[#EBEBEB] transition-colors"
-                  >
-                    RESET
-                  </button>
-                </div>
-              </div>
-            </div>
+
 
             {/* Saved Progressions */}
             {savedProgressions.length > 0 && (
