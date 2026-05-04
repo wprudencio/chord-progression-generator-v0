@@ -388,6 +388,66 @@ const DRUM_STYLE_PATTERNS: Record<string, Record<string, Record<string, number[]
       openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
   },
+  basic1: {
+    "4": {
+      kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+      snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+      hihat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    "3": {
+      kick: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      snare: [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      hihat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    "6": {
+      kick: [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+      snare: [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      hihat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+  },
+  basic2: {
+    "4": {
+      kick: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+      hihat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    "3": {
+      kick: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      snare: [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      hihat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    "6": {
+      kick: [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+      snare: [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      hihat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+  },
+  basic3: {
+    "4": {
+      kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+      snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+      hihat: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    "3": {
+      kick: [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+      snare: [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      hihat: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    },
+    "6": {
+      kick: [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0],
+      snare: [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      hihat: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+      openHat: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    },
+  },
   hiphop: {
     "4": {
       kick: [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
@@ -2223,6 +2283,9 @@ export default function ChordGenerator() {
                       className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
                     >
                       <option value="basic">Basic</option>
+                      <option value="basic1">Bsc1</option>
+                      <option value="basic2">Bsc2</option>
+                      <option value="basic3">Bsc3</option>
                       <option value="hiphop">HpHop</option>
                       <option value="house">House</option>
                       <option value="trap">Trap</option>
