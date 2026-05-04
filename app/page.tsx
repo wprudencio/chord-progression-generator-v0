@@ -2016,15 +2016,15 @@ export default function ChordGenerator() {
             <div className="grid grid-cols-2 gap-[2px]">
               <button
                 onClick={isPlaying ? stopPlayback : startPlayback}
-                className={`flex items-center justify-center gap-2 py-4 font-[700] uppercase text-sm tracking-widest transition-all
+                className={`flex items-center justify-center gap-2 py-5 font-[800] uppercase text-base tracking-widest transition-all border-2
                   ${isPlaying 
-                    ? "bg-[#F04E23] orange-panel text-[#111111]" 
-                    : "bg-[#1A1A1A] text-[#F5F5F3] hover:bg-[#F04E23] hover:text-[#111111]"
+                    ? "bg-[#F04E23] border-[#F04E23] text-[#111111]" 
+                    : "bg-[#F04E23] border-[#F04E23] text-[#111111]"
                   }`}
               >
                 {isPlaying ? (
                   <>
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                       <rect x="6" y="4" width="4" height="16" />
                       <rect x="14" y="4" width="4" height="16" />
                     </svg>
@@ -2032,7 +2032,7 @@ export default function ChordGenerator() {
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                     PLAY
@@ -2041,9 +2041,9 @@ export default function ChordGenerator() {
               </button>
               <button
                 onClick={generateProgression}
-                className="flex items-center justify-center gap-2 py-4 bg-[#1A1A1A] text-[#F5F5F3] font-[700] uppercase text-sm tracking-widest hover:bg-[#F04E23] hover:text-[#111111] transition-all"
+                className="flex items-center justify-center gap-2 py-5 bg-[#F04E23] border-2 border-[#F04E23] text-[#111111] font-[800] uppercase text-base tracking-widest transition-all hover:bg-[#d04010]"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M23 4v6h-6M1 20v-6h6" />
                   <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
                 </svg>
