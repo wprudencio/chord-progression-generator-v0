@@ -1961,7 +1961,7 @@ export default function ChordGenerator() {
             <div className="flex items-center gap-1">
               <button
                 onClick={exportProgression}
-                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                className="p-2 text-[#F5F5F3] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
                 title="Copy progression"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1971,7 +1971,7 @@ export default function ChordGenerator() {
               </button>
               <button
                 onClick={saveProgression}
-                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                className="p-2 text-[#F5F5F3] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
                 title="Save progression"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1982,7 +1982,7 @@ export default function ChordGenerator() {
               </button>
               <button
                 onClick={exportMidi}
-                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                className="p-2 text-[#F5F5F3] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
                 title="Export MIDI"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1993,7 +1993,7 @@ export default function ChordGenerator() {
               </button>
               <button
                 onClick={resetSettings}
-                className="p-2 text-[#666] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
+                className="p-2 text-[#F5F5F3] hover:text-[#F04E23] hover:bg-[#1A1A1A] transition-all border border-transparent hover:border-[#F04E23]"
                 title="Reset all settings"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
