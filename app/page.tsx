@@ -1939,13 +1939,13 @@ export default function ChordGenerator() {
 
   return (
     <div className="min-h-screen bg-[#EBEBEB] text-[#111111] font-sans selection:bg-[#F04E23] selection:text-[#111111]">
-      <div className="max-w-7xl mx-auto p-8 min-h-screen flex flex-col">
+      <div className="max-w-7xl mx-auto p-2 md:p-8 min-h-screen flex flex-col">
         {/* Device Frame */}
         <div className="bg-[#F5F5F3] border border-[#CCCCCC] overflow-hidden">
           
           {/* Top Bar — CHORD.GEN + Status + Actions */}
           <div className="bg-[#111111] dark-panel px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 md:gap-3">
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-[800] tracking-tight text-[#F5F5F3]">CHORD.GEN</span>
                 <span className="brand-stamp text-[11px]">v.02</span>
@@ -2002,16 +2002,16 @@ export default function ChordGenerator() {
           </div>
 
           {/* Main Display Area */}
-          <div className="bg-[#111111] dark-panel m-3 mt-2 p-6 border border-[#CCCCCC]">
+          <div className="bg-[#111111] dark-panel m-1 mt-1 p-2 md:m-3 md:mt-2 md:p-6 border border-[#CCCCCC]">
 
 
             {/* Chord Display — larger, more prominent */}
-            <div className="grid grid-cols-4 gap-1 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-2 md:mb-4">
               {progression.map((chord, i) => (
                 <button
                   key={i}
                   onClick={() => playChordPreview(i)}
-                  className={`relative p-6 transition-all cursor-pointer text-left border
+                  className={`relative p-2 md:p-6 transition-all cursor-pointer text-left border
                     ${activeChordIndex === i 
                       ? "bg-[#F04E23] orange-panel text-[#111111] border-[#F04E23]" 
                       : "bg-[#111111] border-[#1A1A1A] text-[#F5F5F3] hover:border-[#F04E23]"
@@ -2044,7 +2044,7 @@ export default function ChordGenerator() {
             <div className="grid grid-cols-2 gap-1">
               <button
                 onClick={isPlaying ? stopPlayback : startPlayback}
-                className={`flex items-center justify-center gap-2 py-5 font-[800] uppercase text-lg tracking-widest transition-all border-2
+                className={`flex items-center justify-center gap-2 py-3 md:py-5 font-[800] uppercase text-sm md:text-lg tracking-widest transition-all border-2
                   ${isPlaying 
                     ? "bg-[#F04E23] border-[#F04E23] text-[#111111]" 
                     : "bg-[#F04E23] border-[#F04E23] text-[#111111]"
@@ -2069,7 +2069,7 @@ export default function ChordGenerator() {
               </button>
               <button
                 onClick={generateProgression}
-                className="flex items-center justify-center gap-2 py-5 bg-[#F04E23] border-2 border-[#F04E23] text-[#111111] font-[800] uppercase text-lg tracking-widest transition-all hover:bg-[#d04010]"
+                className="flex items-center justify-center gap-2 py-3 md:py-5 bg-[#F04E23] border-2 border-[#F04E23] text-[#111111] font-[800] uppercase text-sm md:text-lg tracking-widest transition-all hover:bg-[#d04010]"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M23 4v6h-6M1 20v-6h6" />
@@ -2091,8 +2091,8 @@ export default function ChordGenerator() {
                 <span className="slash-divider text-[#666]">////</span>
                 <span className="mono-label text-[11px] text-[#666] uppercase">Key &middot; Mode &middot; Style &middot; Meter</span>
               </div>
-              <div className="p-3">
-                <div className="grid grid-cols-6 gap-3 mb-2 mono-label text-[12px] text-[#666] px-0.5">
+              <div className="p-1 md:p-3">
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3 mb-1 md:mb-2 mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">
                   <span>KEY</span>
                   <span>MODE</span>
                   <span>STYLE</span>
@@ -2100,7 +2100,7 @@ export default function ChordGenerator() {
                   <span>TIME</span>
                   <span>BARS</span>
                 </div>
-                <div className="grid grid-cols-6 gap-2">
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-1 md:gap-2">
                   <div className="bg-white border border-[#CCCCCC]">
                     <select
                       value={key}
@@ -2226,14 +2226,14 @@ export default function ChordGenerator() {
                 <span className="slash-divider text-[#666]">////</span>
                 <span className="mono-label text-[11px] text-[#666] uppercase">Osc &middot; Pattern &middot; Reverb &middot; Level</span>
               </div>
-              <div className="p-3">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2 mono-label text-[12px] text-[#666] px-0.5">
+              <div className="p-1 md:p-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-1 md:mb-2 mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">
                   <span>SYNTH</span>
                   <span>RHYTHM</span>
                   <span>REVERB</span>
                   <span>CH VOL</span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
                   <div className="bg-white border border-[#CCCCCC]">
                     <select
                       value={settings.synthType}
@@ -2297,8 +2297,8 @@ export default function ChordGenerator() {
                 <span className="slash-divider text-[#666]">////</span>
                 <span className="mono-label text-[11px] text-[#666] uppercase">Pattern &middot; Level &middot; Toggle</span>
               </div>
-              <div className="p-3">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-2 mono-label text-[12px] text-[#666] px-0.5">
+              <div className="p-1 md:p-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-3 mb-1 md:mb-2 mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">
                   <span>STYLE</span>
                   <span>VOLUME</span>
                   <span>ENABLE</span>
@@ -2339,7 +2339,7 @@ export default function ChordGenerator() {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setSettings((s) => ({ ...s, drumsEnabled: !s.drumsEnabled }))}
-                      className={`flex-1 px-3 py-2 mono-label text-[14px] transition-all border
+                      className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 mono-label text-[11px] md:text-[14px] transition-all border
                         ${settings.drumsEnabled 
                           ? "bg-[#111111] text-[#F5F5F3] border-[#111111]" 
                           : "bg-white text-[#666] border-[#CCCCCC]"
@@ -2356,7 +2356,7 @@ export default function ChordGenerator() {
 
             {/* Saved Progressions */}
             {savedProgressions.length > 0 && (
-              <div className="pt-2 border-t border-[#CCCCCC]">
+              <div className="pt-1 md:pt-2 border-t border-[#CCCCCC]">
                 <div className="mono-label text-[12px] text-[#666] mb-1.5">SAVED ///</div>
                 <div className="flex flex-wrap gap-1">
                   {savedProgressions.map((saved, i) => (
@@ -2383,7 +2383,7 @@ export default function ChordGenerator() {
             )}
           </div>
           {/* Footer */}
-          <div className="bg-[#111111] dark-panel px-6 py-3 text-center mono-label text-[12px] text-[#666]">
+          <div className="bg-[#111111] dark-panel px-2 md:px-6 py-2 md:py-3 text-center mono-label text-[12px] text-[#666]">
             SPACE = PLAY/STOP / S = SAVE
           </div>
         </div>
