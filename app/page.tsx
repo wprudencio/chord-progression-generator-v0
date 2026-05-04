@@ -1953,10 +1953,7 @@ export default function ChordGenerator() {
               <span className="text-[#333] mx-0.5">|</span>
               <span className={`w-2 h-2 ${isPlaying ? "bg-[#F04E23]" : "bg-[#666]"}`} />
               <span className="mono-label text-[11px] text-[#666]">{isPlaying ? "PLAYING" : "STOPPED"}</span>
-              <span className="text-[#333] mx-0.5 hidden sm:inline">|</span>
-              <span className="mono-label text-[11px] text-[#F04E23] font-[700] tabular-nums hidden sm:inline">
-                {String(Math.floor(currentBeatRef.current / (settings.timeSignature * 4)) + 1).padStart(2, "0")}.{String((currentBeatRef.current % (settings.timeSignature * 4)) + 1).padStart(1, "0")}
-              </span>
+              
             </div>
             <div className="flex items-center gap-1">
               <button
