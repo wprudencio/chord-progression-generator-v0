@@ -2283,9 +2283,9 @@ export default function ChordGenerator() {
                       className="w-full bg-transparent px-1 py-2 text-[9px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
                     >
                       <option value="basic">Basic</option>
-                      <option value="basic1">Bsc1</option>
-                      <option value="basic2">Bsc2</option>
-                      <option value="basic3">Bsc3</option>
+                      <option value="basic1">Basic-1</option>
+                      <option value="basic2">Basic-2</option>
+                      <option value="basic3">Basic-3</option>
                       <option value="hiphop">HpHop</option>
                       <option value="house">House</option>
                       <option value="trap">Trap</option>
