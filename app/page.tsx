@@ -1369,41 +1369,61 @@ export default function ChordGenerator() {
 
     const vol = settingsRef.current.drumVolume * 1.0
 
-    // Layer 1: Sub sine (fat low end) — rounder, slower decay
-    const subOsc = audioCtxRef.current.createOscillator()
-    const subGain = audioCtxRef.current.createGain()
-    subOsc.type = "sine"
-    subOsc.frequency.setValueAtTime(100, time)
-    subOsc.frequency.exponentialRampToValueAtTime(35, time + 0.2)
-    subGain.gain.setValueAtTime(vol * 0.9, time)
-    subGain.gain.exponentialRampToValueAtTime(0.001, time + 0.45)
-    subOsc.connect(subGain)
+    // Layer 1: Drum head attack — noise burst shaped like a beater hit
+    const attackLen = audioCtxRef.current.sampleRate * 0.03
+    const attackBuffer = audioCtxRef.current.createBuffer(1, attackLen, audioCtxRef.current.sampleRate)
+    const attackData = attackBuffer.getChannelData(0)
+    for (let i = 0; i < attackLen; i++) {
+      attackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / attackLen, 6)
+    }
+    const attackSource = audioCtxRef.current.createBufferSource()
+    attackSource.buffer = attackBuffer
+    const attackFilter = audioCtxRef.current.createBiquadFilter()
+    attackFilter.type = "bandpass"
+    attackFilter.frequency.value = 500
+    attackFilter.Q.value = 2.0
+    const attackGain = audioCtxRef.current.createGain()
+    attackGain.gain.setValueAtTime(vol * 0.5, time)
+    attackGain.gain.exponentialRampToValueAtTime(0.001, time + 0.03)
+    attackSource.connect(attackFilter)
+    attackFilter.connect(attackGain)
 
-    // Layer 2: Body (warm triangle) — less click, more thud
+    // Layer 2: Drum body — low sine with boxy resonance
     const bodyOsc = audioCtxRef.current.createOscillator()
     const bodyGain = audioCtxRef.current.createGain()
     bodyOsc.type = "sine"
-    bodyOsc.frequency.setValueAtTime(150, time)
-    bodyOsc.frequency.exponentialRampToValueAtTime(50, time + 0.1)
-    bodyGain.gain.setValueAtTime(vol * 0.6, time)
-    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.25)
+    bodyOsc.frequency.setValueAtTime(120, time)
+    bodyOsc.frequency.exponentialRampToValueAtTime(45, time + 0.15)
+    bodyGain.gain.setValueAtTime(vol * 0.8, time)
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.35)
     bodyOsc.connect(bodyGain)
+
+    // Layer 3: Low boom — sub rumble
+    const boomOsc = audioCtxRef.current.createOscillator()
+    const boomGain = audioCtxRef.current.createGain()
+    boomOsc.type = "sine"
+    boomOsc.frequency.setValueAtTime(60, time)
+    boomOsc.frequency.exponentialRampToValueAtTime(25, time + 0.25)
+    boomGain.gain.setValueAtTime(vol * 0.6, time)
+    boomGain.gain.exponentialRampToValueAtTime(0.001, time + 0.5)
+    boomOsc.connect(boomGain)
 
     // Sum layers
     const sumGain = audioCtxRef.current.createGain()
-    subGain.connect(sumGain)
+    attackGain.connect(sumGain)
     bodyGain.connect(sumGain)
+    boomGain.connect(sumGain)
 
-    // Round it off with a gentle lowpass
+    // Gentle lowpass to keep it warm
     const filter = audioCtxRef.current.createBiquadFilter()
     filter.type = "lowpass"
-    filter.frequency.value = 300
+    filter.frequency.value = 400
 
     sumGain.connect(filter)
 
     const dryGain = audioCtxRef.current.createGain()
     const wetGain = audioCtxRef.current.createGain()
-    const reverbAmount = settingsRef.current.reverbAmount * 0.25
+    const reverbAmount = settingsRef.current.reverbAmount * 0.2
 
     dryGain.gain.value = 1 - reverbAmount
     wetGain.gain.value = reverbAmount
@@ -1413,11 +1433,13 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(...[subOsc, bodyOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
-    subOsc.start(time)
+    activeNodesRef.current.push(...[attackSource, bodyOsc, boomOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
+    attackSource.start(time)
     bodyOsc.start(time)
-    subOsc.stop(time + 0.5)
-    bodyOsc.stop(time + 0.3)
+    boomOsc.start(time)
+    attackSource.stop(time + 0.04)
+    bodyOsc.stop(time + 0.4)
+    boomOsc.stop(time + 0.55)
   }, [])
 
   const playSnare = useCallback((time: number) => {
@@ -1425,44 +1447,65 @@ export default function ChordGenerator() {
 
     const vol = settingsRef.current.drumVolume * 0.9
 
-    // Layer 1: Warmer body tone (rounded sine instead of triangle)
-    const toneOsc = audioCtxRef.current.createOscillator()
-    const toneGain = audioCtxRef.current.createGain()
-    toneOsc.type = "sine"
-    toneOsc.frequency.setValueAtTime(200, time)
-    toneOsc.frequency.exponentialRampToValueAtTime(100, time + 0.15)
-    toneGain.gain.setValueAtTime(vol * 0.5, time)
-    toneGain.gain.exponentialRampToValueAtTime(0.001, time + 0.2)
-    toneOsc.connect(toneGain)
-
-    // Layer 2: Noise body (main snare sound) — less high-end, more body
-    const noiseLen = audioCtxRef.current.sampleRate * 0.2
-    const noiseBuffer = audioCtxRef.current.createBuffer(1, noiseLen, audioCtxRef.current.sampleRate)
-    const noiseData = noiseBuffer.getChannelData(0)
-    for (let i = 0; i < noiseLen; i++) {
-      noiseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, 1.5)
+    // Layer 1: Stick attack — sharp transient
+    const attackLen = audioCtxRef.current.sampleRate * 0.005
+    const attackBuffer = audioCtxRef.current.createBuffer(1, attackLen, audioCtxRef.current.sampleRate)
+    const attackData = attackBuffer.getChannelData(0)
+    for (let i = 0; i < attackLen; i++) {
+      attackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / attackLen, 8)
     }
-    const noiseSource = audioCtxRef.current.createBufferSource()
-    noiseSource.buffer = noiseBuffer
-    // Bandpass for warmer snare — cuts both low rumble and harsh highs
-    const noiseFilter = audioCtxRef.current.createBiquadFilter()
-    noiseFilter.type = "bandpass"
-    noiseFilter.frequency.value = 800
-    noiseFilter.Q.value = 0.8
-    const noiseGain = audioCtxRef.current.createGain()
-    noiseGain.gain.setValueAtTime(vol * 0.7, time)
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.2)
-    noiseSource.connect(noiseFilter)
-    noiseFilter.connect(noiseGain)
+    const attackSource = audioCtxRef.current.createBufferSource()
+    attackSource.buffer = attackBuffer
+    const attackGain = audioCtxRef.current.createGain()
+    attackGain.gain.setValueAtTime(vol * 0.4, time)
+    attackGain.gain.exponentialRampToValueAtTime(0.001, time + 0.006)
+    attackSource.connect(attackGain)
+
+    // Layer 2: Snare wires — bandpass noise with rattle
+    const wireLen = audioCtxRef.current.sampleRate * 0.12
+    const wireBuffer = audioCtxRef.current.createBuffer(1, wireLen, audioCtxRef.current.sampleRate)
+    const wireData = wireBuffer.getChannelData(0)
+    for (let i = 0; i < wireLen; i++) {
+      wireData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / wireLen, 3)
+    }
+    const wireSource = audioCtxRef.current.createBufferSource()
+    wireSource.buffer = wireBuffer
+    const wireFilter = audioCtxRef.current.createBiquadFilter()
+    wireFilter.type = "highpass"
+    wireFilter.frequency.value = 2000
+    const wireGain = audioCtxRef.current.createGain()
+    wireGain.gain.setValueAtTime(vol * 0.5, time)
+    wireGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1)
+    wireSource.connect(wireFilter)
+    wireFilter.connect(wireGain)
+
+    // Layer 3: Drum body noise — low-mid warmth from the shell
+    const bodyLen = audioCtxRef.current.sampleRate * 0.2
+    const bodyBuffer = audioCtxRef.current.createBuffer(1, bodyLen, audioCtxRef.current.sampleRate)
+    const bodyData = bodyBuffer.getChannelData(0)
+    for (let i = 0; i < bodyLen; i++) {
+      bodyData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bodyLen, 1.5)
+    }
+    const bodySource = audioCtxRef.current.createBufferSource()
+    bodySource.buffer = bodyBuffer
+    const bodyFilter = audioCtxRef.current.createBiquadFilter()
+    bodyFilter.type = "lowpass"
+    bodyFilter.frequency.value = 1000
+    const bodyGain = audioCtxRef.current.createGain()
+    bodyGain.gain.setValueAtTime(vol * 0.6, time)
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.2)
+    bodySource.connect(bodyFilter)
+    bodyFilter.connect(bodyGain)
 
     // Sum layers
     const sumGain = audioCtxRef.current.createGain()
-    toneGain.connect(sumGain)
-    noiseGain.connect(sumGain)
+    attackGain.connect(sumGain)
+    wireGain.connect(sumGain)
+    bodyGain.connect(sumGain)
 
     const dryGain = audioCtxRef.current.createGain()
     const wetGain = audioCtxRef.current.createGain()
-    const reverbAmount = settingsRef.current.reverbAmount * 0.4
+    const reverbAmount = settingsRef.current.reverbAmount * 0.35
 
     dryGain.gain.value = 1 - reverbAmount
     wetGain.gain.value = reverbAmount
@@ -1472,59 +1515,72 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(...[toneOsc, noiseSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
-    toneOsc.start(time)
-    noiseSource.start(time)
-    toneOsc.stop(time + 0.25)
+    activeNodesRef.current.push(...[attackSource, wireSource, bodySource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
+    attackSource.start(time)
+    wireSource.start(time)
+    bodySource.start(time)
+    attackSource.stop(time + 0.008)
+    wireSource.stop(time + 0.14)
+    bodySource.stop(time + 0.22)
   }, [])
 
   const playHiHat = useCallback((time: number, open: boolean = false) => {
     if (!audioCtxRef.current || !masterGainRef.current || !reverbNodeRef.current) return
 
-    const vol = settingsRef.current.drumVolume * (open ? 0.35 : 0.4)
-    const hiLen = open ? 0.3 : 0.06
+    const vol = settingsRef.current.drumVolume * (open ? 0.3 : 0.35)
+    const hiLen = open ? 0.35 : 0.05
 
-    // Layer 1: Filtered noise (main hat sound) — warmer bandpass, slower decay
-    const noiseLen = audioCtxRef.current.sampleRate * hiLen
-    const noiseBuffer = audioCtxRef.current.createBuffer(2, noiseLen, audioCtxRef.current.sampleRate)
+    // Layer 1: Cymbal wash — dense noise with slow decay
+    const washLen = audioCtxRef.current.sampleRate * hiLen
+    const washBuffer = audioCtxRef.current.createBuffer(2, washLen, audioCtxRef.current.sampleRate)
     for (let ch = 0; ch < 2; ch++) {
-      const channelData = noiseBuffer.getChannelData(ch)
-      for (let i = 0; i < noiseLen; i++) {
-        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, open ? 1.2 : 4)
+      const channelData = washBuffer.getChannelData(ch)
+      for (let i = 0; i < washLen; i++) {
+        const env = Math.pow(1 - i / washLen, open ? 1.0 : 6)
+        channelData[i] = (Math.random() * 2 - 1) * env
       }
     }
-    const noiseSource = audioCtxRef.current.createBufferSource()
-    noiseSource.buffer = noiseBuffer
+    const washSource = audioCtxRef.current.createBufferSource()
+    washSource.buffer = washBuffer
 
-    // Lower bandpass for warmer tone — less piercing
-    const bpFilter = audioCtxRef.current.createBiquadFilter()
-    bpFilter.type = "bandpass"
-    bpFilter.frequency.value = open ? 4000 : 6000
-    bpFilter.Q.value = open ? 1.0 : 0.6
+    // Highpass for bright cymbal sizzle
+    const hpFilter = audioCtxRef.current.createBiquadFilter()
+    hpFilter.type = "highpass"
+    hpFilter.frequency.value = open ? 3000 : 5000
 
-    const hiGain = audioCtxRef.current.createGain()
-    hiGain.gain.setValueAtTime(vol, time)
-    hiGain.gain.exponentialRampToValueAtTime(0.001, time + hiLen)
+    const washGain = audioCtxRef.current.createGain()
+    washGain.gain.setValueAtTime(vol * 0.8, time)
+    washGain.gain.exponentialRampToValueAtTime(0.001, time + hiLen)
 
-    noiseSource.connect(bpFilter)
-    bpFilter.connect(hiGain)
+    washSource.connect(hpFilter)
+    hpFilter.connect(washGain)
 
-    // Layer 2: Subtle body tone (lower sine for warmth)
-    const bodyOsc = audioCtxRef.current.createOscillator()
-    const bodyGain = audioCtxRef.current.createGain()
-    bodyOsc.type = "sine"
-    bodyOsc.frequency.value = open ? 2500 : 5000
-    bodyGain.gain.setValueAtTime(vol * 0.15, time)
-    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + (open ? 0.15 : 0.02))
-    bodyOsc.connect(bodyGain)
+    // Layer 2: Sizzle layer — metallic ring via comb-filtered noise
+    const sizzleLen = audioCtxRef.current.sampleRate * (open ? 0.2 : 0.03)
+    const sizzleBuffer = audioCtxRef.current.createBuffer(1, sizzleLen, audioCtxRef.current.sampleRate)
+    const sizzleData = sizzleBuffer.getChannelData(0)
+    for (let i = 0; i < sizzleLen; i++) {
+      sizzleData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / sizzleLen, open ? 1.5 : 10)
+    }
+    const sizzleSource = audioCtxRef.current.createBufferSource()
+    sizzleSource.buffer = sizzleBuffer
+    const sizzleBP = audioCtxRef.current.createBiquadFilter()
+    sizzleBP.type = "bandpass"
+    sizzleBP.frequency.value = open ? 5000 : 8000
+    sizzleBP.Q.value = open ? 0.5 : 0.3
+    const sizzleGain = audioCtxRef.current.createGain()
+    sizzleGain.gain.setValueAtTime(vol * 0.5, time)
+    sizzleGain.gain.exponentialRampToValueAtTime(0.001, time + (open ? 0.15 : 0.02))
+    sizzleSource.connect(sizzleBP)
+    sizzleBP.connect(sizzleGain)
 
     const sumGain = audioCtxRef.current.createGain()
-    hiGain.connect(sumGain)
-    bodyGain.connect(sumGain)
+    washGain.connect(sumGain)
+    sizzleGain.connect(sumGain)
 
     const dryGain = audioCtxRef.current.createGain()
     const wetGain = audioCtxRef.current.createGain()
-    const reverbAmount = settingsRef.current.reverbAmount * 0.3
+    const reverbAmount = settingsRef.current.reverbAmount * 0.25
 
     dryGain.gain.value = 1 - reverbAmount
     wetGain.gain.value = reverbAmount
@@ -1534,10 +1590,11 @@ export default function ChordGenerator() {
     dryGain.connect(masterGainRef.current)
     wetGain.connect(reverbNodeRef.current)
 
-    activeNodesRef.current.push(...[noiseSource, bodyOsc].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
-    noiseSource.start(time)
-    bodyOsc.start(time)
-    bodyOsc.stop(time + (open ? 0.18 : 0.03))
+    activeNodesRef.current.push(...[washSource, sizzleSource].map(n => { n.onended = () => { const i = activeNodesRef.current.indexOf(n); if(i>=0) activeNodesRef.current.splice(i,1) }; return n }))
+    washSource.start(time)
+    sizzleSource.start(time)
+    washSource.stop(time + hiLen + 0.01)
+    sizzleSource.stop(time + (open ? 0.22 : 0.04))
   }, [])
 
   
