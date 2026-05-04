@@ -2092,9 +2092,17 @@ export default function ChordGenerator() {
                 <span className="mono-label text-[11px] text-[#666] uppercase">Key &middot; Mode &middot; Style &middot; Meter</span>
               </div>
               <div className="p-1 md:p-3">
+                <div className="hidden md:grid grid-cols-6 gap-2 mb-1 mono-label text-[12px] text-[#666] px-0.5">
+                  <span>KEY</span>
+                  <span>MODE</span>
+                  <span>STYLE</span>
+                  <span>BPM</span>
+                  <span>TIME</span>
+                  <span>BARS</span>
+                </div>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-1 md:gap-2">
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">KEY</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">KEY</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={key}
@@ -2108,7 +2116,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">MODE</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">MODE</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={mode}
@@ -2138,7 +2146,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">STYLE</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">STYLE</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={style}
@@ -2169,7 +2177,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">BPM</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">BPM</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <input
                         type="number"
@@ -2197,7 +2205,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">TIME</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">TIME</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={settings.timeSignature}
@@ -2211,7 +2219,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">BARS</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">BARS</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={settings.barsPerChord}
@@ -2237,9 +2245,15 @@ export default function ChordGenerator() {
                 <span className="mono-label text-[11px] text-[#666] uppercase">Osc &middot; Pattern &middot; Reverb &middot; Level</span>
               </div>
               <div className="p-1 md:p-3">
+                <div className="hidden md:grid grid-cols-4 gap-2 mb-1 mono-label text-[12px] text-[#666] px-0.5">
+                  <span>SYNTH</span>
+                  <span>RHYTHM</span>
+                  <span>REVERB</span>
+                  <span>CH VOL</span>
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">SYNTH</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">SYNTH</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={settings.synthType}
@@ -2262,7 +2276,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">RHYTHM</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">RHYTHM</span>
                     <div className="bg-white border border-[#CCCCCC]">
                       <select
                         value={settings.synthRhythm}
@@ -2276,7 +2290,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">REVERB</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">REVERB</span>
                     <div className="bg-white border border-[#CCCCCC] px-3 py-2">
                       <input
                         type="range"
@@ -2289,7 +2303,7 @@ export default function ChordGenerator() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">CH VOL</span>
+                    <span className="mono-label text-[10px] md:hidden text-[#666] px-0.5">CH VOL</span>
                     <div className="bg-white border border-[#CCCCCC] px-3 py-2 flex items-center gap-2">
                       <input
                         type="range"
