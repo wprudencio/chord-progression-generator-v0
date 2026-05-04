@@ -2092,127 +2092,137 @@ export default function ChordGenerator() {
                 <span className="mono-label text-[11px] text-[#666] uppercase">Key &middot; Mode &middot; Style &middot; Meter</span>
               </div>
               <div className="p-1 md:p-3">
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3 mb-1 md:mb-2 mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">
-                  <span>KEY</span>
-                  <span>MODE</span>
-                  <span>STYLE</span>
-                  <span>BPM</span>
-                  <span>TIME</span>
-                  <span>BARS</span>
-                </div>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-1 md:gap-2">
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={key}
-                      onChange={(e) => setKey(e.target.value)}
-                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      {NOTES.map((n) => (
-                        <option key={n} value={n}>{n}</option>
-                      ))}
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">KEY</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={key}
+                        onChange={(e) => setKey(e.target.value)}
+                        className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        {NOTES.map((n) => (
+                          <option key={n} value={n}>{n}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={mode}
-                      onChange={(e) => setMode(e.target.value)}
-                      className="w-full bg-transparent px-1 py-3 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      <option value="major">Maj</option>
-                      <option value="minor">Min</option>
-                      <option value="dorian">Dor</option>
-                      <option value="mixolydian">Mix</option>
-                      <option value="lydian">Lyd</option>
-                      <option value="phrygian">Phr</option>
-                      <option value="locrian">Loc</option>
-                      <option value="aeolian">Aeo</option>
-                      <option value="harmonicMinor">Hrm</option>
-                      <option value="melodicMinor">Mel</option>
-                      <option value="wholeTone">Whl</option>
-                      <option value="blues">Blu</option>
-                      <option value="pentatonicMajor">Pn+</option>
-                      <option value="pentatonicMinor">Pn-</option>
-                      <option value="hungarian">Hun</option>
-                      <option value="japanese">Jpn</option>
-                      <option value="arabian">Arb</option>
-                      <option value="persian">Per</option>
-                      <option value="bebop">Bop</option>
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">MODE</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value)}
+                        className="w-full bg-transparent px-1 py-3 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        <option value="major">Maj</option>
+                        <option value="minor">Min</option>
+                        <option value="dorian">Dor</option>
+                        <option value="mixolydian">Mix</option>
+                        <option value="lydian">Lyd</option>
+                        <option value="phrygian">Phr</option>
+                        <option value="locrian">Loc</option>
+                        <option value="aeolian">Aeo</option>
+                        <option value="harmonicMinor">Hrm</option>
+                        <option value="melodicMinor">Mel</option>
+                        <option value="wholeTone">Whl</option>
+                        <option value="blues">Blu</option>
+                        <option value="pentatonicMajor">Pn+</option>
+                        <option value="pentatonicMinor">Pn-</option>
+                        <option value="hungarian">Hun</option>
+                        <option value="japanese">Jpn</option>
+                        <option value="arabian">Arb</option>
+                        <option value="persian">Per</option>
+                        <option value="bebop">Bop</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={style}
-                      onChange={(e) => setStyle(e.target.value)}
-                      className="w-full bg-transparent px-1 py-3 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      <option value="modern">Pop</option>
-                      <option value="electronic">Elec</option>
-                      <option value="ambient">Amb</option>
-                      <option value="jazzy">Jazz</option>
-                      <option value="lofi">Lofi</option>
-                      <option value="cinematic">Cine</option>
-                      <option value="rnb">R&B</option>
-                      <option value="gospel">Gosp</option>
-                      <option value="funk">Funk</option>
-                      <option value="indie">Indi</option>
-                      <option value="bossa">Boss</option>
-                      <option value="reggaeton">Regt</option>
-                      <option value="country">Ctry</option>
-                      <option value="metal">Metl</option>
-                      <option value="classical">Clsc</option>
-                      <option value="disco">Disc</option>
-                      <option value="synthwave">Synw</option>
-                      <option value="edm">EDM</option>
-                      <option value="latin">Latn</option>
-                      <option value="afrobeat">Afro</option>
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">STYLE</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={style}
+                        onChange={(e) => setStyle(e.target.value)}
+                        className="w-full bg-transparent px-1 py-3 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        <option value="modern">Pop</option>
+                        <option value="electronic">Elec</option>
+                        <option value="ambient">Amb</option>
+                        <option value="jazzy">Jazz</option>
+                        <option value="lofi">Lofi</option>
+                        <option value="cinematic">Cine</option>
+                        <option value="rnb">R&amp;B</option>
+                        <option value="gospel">Gosp</option>
+                        <option value="funk">Funk</option>
+                        <option value="indie">Indi</option>
+                        <option value="bossa">Boss</option>
+                        <option value="reggaeton">Regt</option>
+                        <option value="country">Ctry</option>
+                        <option value="metal">Metl</option>
+                        <option value="classical">Clsc</option>
+                        <option value="disco">Disc</option>
+                        <option value="synthwave">Synw</option>
+                        <option value="edm">EDM</option>
+                        <option value="latin">Latn</option>
+                        <option value="afrobeat">Afro</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <input
-                      type="number"
-                      value={bpmInput}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setBpmInput(val)
-                        const num = parseInt(val)
-                        if (!isNaN(num)) {
-                          if (num >= 1 && num <= 999) {
-                            setSettings((s) => ({ ...s, bpm: num }))
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">BPM</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <input
+                        type="number"
+                        value={bpmInput}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setBpmInput(val)
+                          const num = parseInt(val)
+                          if (!isNaN(num)) {
+                            if (num >= 1 && num <= 999) {
+                              setSettings((s) => ({ ...s, bpm: num }))
+                            }
                           }
-                        }
-                      }}
-                      onBlur={() => {
-                        const num = parseInt(bpmInput)
-                        const clamped = Math.max(40, Math.min(200, num || 90))
-                        setSettings((s) => ({ ...s, bpm: clamped }))
-                        setBpmInput(clamped.toString())
-                      }}
-                      min={40}
-                      max={200}
-                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] text-center focus:outline-none font-mono"
-                    />
+                        }}
+                        onBlur={() => {
+                          const num = parseInt(bpmInput)
+                          const clamped = Math.max(40, Math.min(200, num || 90))
+                          setSettings((s) => ({ ...s, bpm: clamped }))
+                          setBpmInput(clamped.toString())
+                        }}
+                        min={40}
+                        max={200}
+                        className="w-full bg-transparent px-1 py-2 text-sm font-[700] text-center focus:outline-none font-mono"
+                      />
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={settings.timeSignature}
-                      onChange={(e) => setSettings((s) => ({ ...s, timeSignature: parseInt(e.target.value) }))}
-                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      <option value="4">4/4</option>
-                      <option value="3">3/4</option>
-                      <option value="6">6/8</option>
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">TIME</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={settings.timeSignature}
+                        onChange={(e) => setSettings((s) => ({ ...s, timeSignature: parseInt(e.target.value) }))}
+                        className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        <option value="4">4/4</option>
+                        <option value="3">3/4</option>
+                        <option value="6">6/8</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={settings.barsPerChord}
-                      onChange={(e) => setSettings((s) => ({ ...s, barsPerChord: parseInt(e.target.value) }))}
-                      className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="4">4</option>
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">BARS</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={settings.barsPerChord}
+                        onChange={(e) => setSettings((s) => ({ ...s, barsPerChord: parseInt(e.target.value) }))}
+                        className="w-full bg-transparent px-1 py-2 text-sm font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2227,63 +2237,69 @@ export default function ChordGenerator() {
                 <span className="mono-label text-[11px] text-[#666] uppercase">Osc &middot; Pattern &middot; Reverb &middot; Level</span>
               </div>
               <div className="p-1 md:p-3">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-1 md:mb-2 mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">
-                  <span>SYNTH</span>
-                  <span>RHYTHM</span>
-                  <span>REVERB</span>
-                  <span>CH VOL</span>
-                </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-2">
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={settings.synthType}
-                      onChange={(e) => setSettings((s) => ({ ...s, synthType: e.target.value }))}
-                      className="w-full bg-transparent px-1 py-2 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      <option value="pad">Pad</option>
-                      <option value="pluck">Pluck</option>
-                      <option value="keys">Keys</option>
-                      <option value="strings">Strng</option>
-                      <option value="organ">Organ</option>
-                      <option value="bell">Bell</option>
-                      <option value="bass">Bass</option>
-                      <option value="lead">Lead</option>
-                      <option value="brass">Brass</option>
-                      <option value="fm">FM</option>
-                      <option value="supersaw">Super</option>
-                      <option value="wobble">Wobb</option>
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">SYNTH</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={settings.synthType}
+                        onChange={(e) => setSettings((s) => ({ ...s, synthType: e.target.value }))}
+                        className="w-full bg-transparent px-1 py-2 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        <option value="pad">Pad</option>
+                        <option value="pluck">Pluck</option>
+                        <option value="keys">Keys</option>
+                        <option value="strings">Strng</option>
+                        <option value="organ">Organ</option>
+                        <option value="bell">Bell</option>
+                        <option value="bass">Bass</option>
+                        <option value="lead">Lead</option>
+                        <option value="brass">Brass</option>
+                        <option value="fm">FM</option>
+                        <option value="supersaw">Super</option>
+                        <option value="wobble">Wobb</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC]">
-                    <select
-                      value={settings.synthRhythm}
-                      onChange={(e) => setSettings((s) => ({ ...s, synthRhythm: e.target.value }))}
-                      className="w-full bg-transparent px-1 py-2 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
-                    >
-                      {Object.entries(SYNTH_RHYTHMS).map(([k, { name }]) => (
-                        <option key={k} value={k}>{name}</option>
-                      ))}
-                    </select>
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">RHYTHM</span>
+                    <div className="bg-white border border-[#CCCCCC]">
+                      <select
+                        value={settings.synthRhythm}
+                        onChange={(e) => setSettings((s) => ({ ...s, synthRhythm: e.target.value }))}
+                        className="w-full bg-transparent px-1 py-2 text-[14px] font-[700] uppercase cursor-pointer focus:outline-none appearance-none text-center font-mono"
+                      >
+                        {Object.entries(SYNTH_RHYTHMS).map(([k, { name }]) => (
+                          <option key={k} value={k}>{name}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC] px-3 py-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.reverbAmount * 100}
-                      onChange={(e) => setSettings((s) => ({ ...s, reverbAmount: parseInt(e.target.value) / 100 }))}
-                      className="w-full"
-                    />
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">REVERB</span>
+                    <div className="bg-white border border-[#CCCCCC] px-3 py-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.reverbAmount * 100}
+                        onChange={(e) => setSettings((s) => ({ ...s, reverbAmount: parseInt(e.target.value) / 100 }))}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
-                  <div className="bg-white border border-[#CCCCCC] px-3 py-2 flex items-center gap-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.chordVolume * 100}
-                      onChange={(e) => setSettings((s) => ({ ...s, chordVolume: parseInt(e.target.value) / 100 }))}
-                      className="flex-1"
-                    />
+                  <div className="flex flex-col gap-1">
+                    <span className="mono-label text-[10px] md:text-[12px] text-[#666] px-0.5">CH VOL</span>
+                    <div className="bg-white border border-[#CCCCCC] px-3 py-2 flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.chordVolume * 100}
+                        onChange={(e) => setSettings((s) => ({ ...s, chordVolume: parseInt(e.target.value) / 100 }))}
+                        className="flex-1"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
